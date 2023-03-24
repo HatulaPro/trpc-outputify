@@ -1,27 +1,17 @@
-/* eslint-disable */
-// @ts-nocheck
+import { initTRPC } from '@trpc/server';
+import { z } from 'zod';
 
-const procedure = {
-	input: (x: number) => ({
-		value: x * x,
-		query: (f: () => { z: string }) => f,
-		output: (x: object) => ({
-			value: x,
-			query: (f: () => { z: string }) => f,
+const t = initTRPC.context().create();
+t.router({
+	myProc: t.procedure
+		.use((m) => {
+			return m.next({ ctx: m.ctx });
+		})
+		.input(z.string())
+		.use((m) => {
+			return m.next({ ctx: m.ctx });
+		})
+		.query(() => {
+			return { z: 'asd' };
 		}),
-	}),
-};
-
-export function x<T>(y: T) {
-	return {
-		abc: procedure
-			.input(987987)
-			.testing(() => console.log(whoknows.input(123).cake().query()))
-			.something([1, 23])
-			.output('{ z: string; }')
-			.query(() => {
-				return { z: 'asd' };
-			}),
-		y,
-	};
-}
+});

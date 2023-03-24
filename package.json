@@ -5,7 +5,9 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "tsup src/index.ts --format cjs,esm --dts",
-		"lint": "tsc && eslint"
+		"lint": "tsc && eslint",
+		"dev": "vitest",
+		"test": "vitest run"
 	},
 	"keywords": [],
 	"author": "Shalev Raz Israel",
@@ -15,9 +17,12 @@
 		"@typescript-eslint/parser": "^5.56.0",
 		"eslint": "^8.36.0",
 		"tsup": "^6.7.0",
-		"typescript": "^5.0.2"
+		"typescript": "^5.0.2",
+		"vitest": "^0.29.7"
 	},
 	"dependencies": {
-		"ts-morph": "^17.0.1"
+		"@trpc/server": "^10.18.0",
+		"ts-morph": "^17.0.1",
+		"zod": "^3.21.4"
 	}
 }
