@@ -35,7 +35,9 @@ describe('Adding an output in the right place', () => {
 		handleFile(project)(f);
 		project.emitToMemory();
 		const text = f.getText();
-		expect(text).toContain('.input(z.string()).output("{ z: string; }")');
+		expect(text).toContain(
+			'.input(z.string()).output(/* BEGIN GENERATED CONTENT */ "{ z: string; }" /* END GENERATED CONTENT */)'
+		);
 	});
 
 	it('Should create an output right before the RPC', () => {
@@ -64,7 +66,9 @@ describe('Adding an output in the right place', () => {
 		handleFile(project)(f);
 		project.emitToMemory();
 		const text = f.getText();
-		expect(text).toContain('.output("{ z: string; }").query(');
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ "{ z: string; }" /* END GENERATED CONTENT */).query'
+		);
 	});
 
 	it('Should update the output', () => {
@@ -88,6 +92,8 @@ describe('Adding an output in the right place', () => {
 		handleFile(project)(f);
 		project.emitToMemory();
 		const text = f.getText();
-		expect(text).toContain('.output("{ z: string; }")');
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ "{ z: string; }" /* END GENERATED CONTENT */)'
+		);
 	});
 });

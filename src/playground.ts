@@ -8,6 +8,7 @@ t.router({
 			return m.next({ ctx: m.ctx });
 		})
 		.input(z.string())
+		.output(z.object({ z: z.string() }))
 		.use((m) => {
 			return m.next({ ctx: m.ctx });
 		})
