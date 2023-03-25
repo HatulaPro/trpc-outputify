@@ -207,4 +207,31 @@ describe('Testing the entire transformation process', () => {
 		const text = f.getText();
 		expect(text).not.contain('z.date()');
 	});
+
+	it("Should unwrap the promise and detect the array's value.", () => {
+		const f = project.createSourceFile(
+			'asdasd.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure
+					.output(z.object({z: z.string()}))
+					.query(async () => {
+						await new Promise((resolve) => setTimeout(resolve, 100));
+						return [1, 2, 3].map((x) => x % 2 === 0 ? x : x.toString());
+					}),
+			});
+			`,
+			{ overwrite: true }
+		);
+
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.array(z.union([z.string(), z.number()])) /* END GENERATED CONTENT */)'
+		);
+	});
 });

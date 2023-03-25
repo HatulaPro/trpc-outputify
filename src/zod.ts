@@ -50,6 +50,17 @@ function writeZodTypeRecursive(
 		return writeSimpleZodValidator(f, 'literal', [
 			f.createBigIntLiteral(t.getLiteralValue() as ts.PseudoBigInt),
 		]);
+	} else if (t.isArray()) {
+		const elType = t.getArrayElementType();
+		if (elType) {
+			return writeSimpleZodValidator(f, 'array', [
+				writeZodTypeRecursive(f, elType),
+			]);
+		} else {
+			return writeSimpleZodValidator(f, 'array', [
+				writeSimpleZodValidator(f, 'any'),
+			]);
+		}
 	} else if (isDateType(t)) {
 		return writeSimpleZodValidator(f, 'date');
 	}
