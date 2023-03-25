@@ -8,12 +8,12 @@ t.router({
     return m.next({ ctx: m.ctx });
 })
     .input(z.string())
-    .output(/* BEGIN GENERATED CONTENT */ z.null() /* END GENERATED CONTENT */)
+    .output(/* BEGIN GENERATED CONTENT */ z.union([z.null(), z.string()]) /* END GENERATED CONTENT */)
 		.use((m) => {
 			return m.next({ ctx: m.ctx });
 		})
-		.query<null>(async () => {
+		.query(async () => {
 			await new Promise((resolve) => setTimeout(resolve, 100));
-			return null;
+			return Math.random() > 0.5 ? ('hello' as string) : null;
 		}),
 });

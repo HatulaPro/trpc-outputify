@@ -7,7 +7,10 @@ export function writeZodType(f: ts.NodeFactory, t: Type<ts.Type>) {
 	return [wrapWithComments(writeZodTypeRecursive(f, promised))];
 }
 
-function writeZodTypeRecursive(f: ts.NodeFactory, t: Type<ts.Type>) {
+function writeZodTypeRecursive(
+	f: ts.NodeFactory,
+	t: Type<ts.Type>
+): ts.Expression {
 	if (t.isString()) {
 		return f.createCallExpression(
 			f.createPropertyAccessExpression(
@@ -70,6 +73,23 @@ function writeZodTypeRecursive(f: ts.NodeFactory, t: Type<ts.Type>) {
 			),
 			undefined,
 			[]
+		);
+	} else if (t.isUnion()) {
+		const unionTypes = t.getUnionTypes();
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(
+				f.createIdentifier('z'),
+				f.createIdentifier('union')
+			),
+			undefined,
+			[
+				f.createArrayLiteralExpression(
+					unionTypes.map((unionType) =>
+						writeZodTypeRecursive(f, unionType)
+					),
+					false
+				),
+			]
 		);
 	}
 	return f.createStringLiteral(t.getText());
