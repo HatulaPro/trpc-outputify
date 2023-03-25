@@ -51,16 +51,7 @@ function writeZodTypeRecursive(
 			f.createBigIntLiteral(t.getLiteralValue() as ts.PseudoBigInt),
 		]);
 	} else if (t.isArray()) {
-		const elType = t.getArrayElementType();
-		if (elType) {
-			return writeSimpleZodValidator(f, 'array', [
-				writeZodTypeRecursive(f, elType),
-			]);
-		} else {
-			return writeSimpleZodValidator(f, 'array', [
-				writeSimpleZodValidator(f, 'any'),
-			]);
-		}
+		return writeArrayType(f, t);
 	} else if (isDateType(t)) {
 		return writeSimpleZodValidator(f, 'date');
 	}
@@ -96,6 +87,19 @@ function writeUnionType(f: ts.NodeFactory, t: Type<ts.Type>) {
 			),
 		]
 	);
+}
+
+function writeArrayType(f: ts.NodeFactory, t: Type<ts.Type>) {
+	const elType = t.getArrayElementType();
+	if (elType) {
+		return writeSimpleZodValidator(f, 'array', [
+			writeZodTypeRecursive(f, elType),
+		]);
+	} else {
+		return writeSimpleZodValidator(f, 'array', [
+			writeSimpleZodValidator(f, 'any'),
+		]);
+	}
 }
 
 function writeSimpleZodValidator(
