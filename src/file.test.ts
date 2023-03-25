@@ -259,4 +259,27 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.array(z.number()) /* END GENERATED CONTENT */)'
 		);
 	});
+
+	it('Should throw an error, because function can not be serialized.', () => {
+		const f = project.createSourceFile(
+			'asdasd.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure
+					.input(z.string())
+					.query(() => {
+						return {
+							x: Math.random(),
+							y: Math.random,
+						};
+					}),
+			});
+			`,
+			{ overwrite: true }
+		);
+		expect(() => handleFile(project)(f)).toThrowError();
+	});
 });

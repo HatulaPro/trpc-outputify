@@ -3,6 +3,7 @@ import {
 	getValueOfBooleanLiteral,
 	isBigIntLiteral,
 	isDateType,
+	isFunction,
 	removePromiseFromType,
 } from './types';
 
@@ -20,6 +21,9 @@ function writeZodTypeRecursive(
 	f: ts.NodeFactory,
 	t: Type<ts.Type>
 ): ts.Expression {
+	if (isFunction(t)) {
+		throw new Error('Can not serialize functions');
+	}
 	if (t.isString()) {
 		return writeSimpleZodValidator(f, 'string');
 	} else if (t.isNumber()) {

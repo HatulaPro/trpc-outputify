@@ -34,3 +34,7 @@ export function isDateType(t: Type<ts.Type>) {
 	}
 	return false;
 }
+
+export function isFunction(t: Type<ts.Type>) {
+	return t.getCallSignatures().length > 0;
+}

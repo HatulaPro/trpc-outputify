@@ -31,7 +31,6 @@ t.router({
 						dinner: z.string(),
 					}),
 				}),
-				run: z.object({}),
 			}) /* END GENERATED CONTENT */
 		)
 		.use((m) => {
@@ -56,9 +55,6 @@ t.router({
 						lunch: 'sandwich',
 						dinner: 'pasta',
 					},
-				},
-				run() {
-					return 'ok';
 				},
 			};
 			return deeplyNestedObject;
