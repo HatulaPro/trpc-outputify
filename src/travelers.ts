@@ -17,7 +17,11 @@ export const Travelers = {
 									f.createIdentifier('output')
 								),
 								undefined,
-								writeZodType(f, procedure.returnType)
+								writeZodType(
+									procedure.node,
+									f,
+									procedure.returnType
+								)
 							);
 						}
 					}
@@ -39,7 +43,11 @@ export const Travelers = {
 								node,
 								child,
 								[],
-								writeZodType(f, procedure.returnType)
+								writeZodType(
+									procedure.node,
+									f,
+									procedure.returnType
+								)
 							);
 						}
 					}
@@ -67,7 +75,11 @@ export const Travelers = {
 										'output'
 									),
 									[],
-									writeZodType(f, procedure.returnType)
+									writeZodType(
+										procedure.node,
+										f,
+										procedure.returnType
+									)
 								),
 								node.name.escapedText
 							);

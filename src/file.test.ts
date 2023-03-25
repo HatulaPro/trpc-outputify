@@ -36,7 +36,7 @@ describe('Testing the entire transformation process', () => {
 		project.emitToMemory();
 		const text = f.getText();
 		expect(text).toContain(
-			'.input(z.string()).output(/* BEGIN GENERATED CONTENT */ "{ z: string; }" /* END GENERATED CONTENT */)'
+			'.input(z.string()).output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */)'
 		);
 	});
 
@@ -67,7 +67,7 @@ describe('Testing the entire transformation process', () => {
 		project.emitToMemory();
 		const text = f.getText();
 		expect(text).toContain(
-			'.output(/* BEGIN GENERATED CONTENT */ "{ z: string; }" /* END GENERATED CONTENT */).query'
+			'.output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */).query'
 		);
 	});
 
@@ -93,7 +93,7 @@ describe('Testing the entire transformation process', () => {
 		project.emitToMemory();
 		const text = f.getText();
 		expect(text).toContain(
-			'.output(/* BEGIN GENERATED CONTENT */ "{ z: string; }" /* END GENERATED CONTENT */)'
+			'.output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */)'
 		);
 	});
 
@@ -234,7 +234,6 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.array(z.union([z.string(), z.number()])) /* END GENERATED CONTENT */)'
 		);
 	});
-
 	it('Should handle a readonly number array like a normal number array.', () => {
 		const f = project.createSourceFile(
 			'asdasd.ts',
