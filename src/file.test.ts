@@ -71,6 +71,31 @@ describe('Testing the entire transformation process', () => {
 		);
 	});
 
+	it('Should create an output right before the RPC', () => {
+		const f = project.createSourceFile(
+			'newfile.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure
+					.query(() => {
+						return { z: 'asd' };
+					}),
+			});
+			`,
+			{ overwrite: true }
+		);
+
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */).query'
+		);
+	});
+
 	it('Should update the output', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',

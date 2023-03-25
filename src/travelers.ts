@@ -61,13 +61,41 @@ export const Travelers = {
 		return (traversal: TransformTraversalControl) => {
 			const node = traversal.visitChildren();
 			const f = traversal.factory;
+			// if (ts.isCallExpression(node)) {
+			// 	const parent = node.parent;
+			// 	if (ts.isPropertyAccessExpression(parent)) {
+			// 		if (
+			// 			parent.name.escapedText === 'query' ||
+			// 			parent.name.escapedText === 'mutation'
+			// 		) {
+			// 			return f.createPropertyAccessExpression(
+			// 				f.createCallExpression(
+			// 					f.createPropertyAccessExpression(
+			// 						node,
+			// 						'output'
+			// 					),
+			// 					[],
+			// 					writeZodType(
+			// 						procedure.node,
+			// 						f,
+			// 						procedure.returnType
+			// 					)
+			// 				),
+			// 				parent.name.escapedText
+			// 			);
+			// 		}
+			// 	}
+			// }
 			if (ts.isPropertyAccessExpression(node)) {
 				if (
 					node.name.escapedText === 'query' ||
 					node.name.escapedText === 'mutation'
 				) {
 					for (const child of node.getChildren()) {
-						if (ts.isCallExpression(child)) {
+						if (
+							ts.isCallExpression(child) ||
+							ts.isPropertyAccessExpression(child)
+						) {
 							return f.createPropertyAccessExpression(
 								f.createCallExpression(
 									f.createPropertyAccessExpression(

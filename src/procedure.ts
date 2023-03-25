@@ -52,6 +52,27 @@ export function handleProcedure(
 		const parent = node.getParentIfKind(
 			SyntaxKind.PropertyAccessExpression
 		);
+		if (child.getName() === 'query' || child.getName() === 'mutation') {
+			const propAccessExprs = [child];
+			const callExpers = [node];
+			const propAccessExprsMap = new Map<
+				string,
+				PropertyAccessExpression<ts.PropertyAccessExpression>
+			>([[child.getName(), child]]);
+			const returnType = getReturnTypeOfCallExpression(project, node);
+			if (!returnType) {
+				// No return type
+				return;
+			}
+			callback({
+				node,
+				callExpers,
+				propAccessExprs,
+				returnType,
+				propAccessExprsMap,
+			});
+			return;
+		}
 		if (!parent) return;
 		const propAccessExprs = [child, parent];
 		const callExpers = [node];

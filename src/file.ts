@@ -29,6 +29,7 @@ export function handleFile(p: Project) {
 					);
 				} else {
 					// If there is no output and no input section, create the output section
+
 					rpcSecion
 						.getParent()
 						?.transform(Travelers.addOutputBeforeRPC(procedure));
