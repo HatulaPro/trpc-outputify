@@ -1,8 +1,11 @@
 import { ts, type Type, SyntaxKind, TypeFlags } from 'ts-morph';
-import { removePromiseFromType } from './types';
+import {
+	getValueOfBooleanLiteral,
+	isBigIntLiteral,
+	removePromiseFromType,
+} from './types';
 
 export function writeZodType(f: ts.NodeFactory, t: Type<ts.Type>) {
-	// console.log(t);
 	const promised = removePromiseFromType(t);
 	return [wrapWithComments(writeZodTypeRecursive(f, promised))];
 }
@@ -27,6 +30,25 @@ function writeZodTypeRecursive(
 		return writeSimpleZodValidator(f, 'any');
 	} else if (t.isUnion()) {
 		return writeUnionType(f, t);
+	} else if (t.isLiteral()) {
+		if (t.isNumberLiteral()) {
+			return writeSimpleZodValidator(f, 'literal', [
+				f.createNumericLiteral(t.getLiteralValue() as number),
+			]);
+		} else if (t.isStringLiteral()) {
+			return writeSimpleZodValidator(f, 'literal', [
+				f.createStringLiteral(t.getLiteralValue() as string),
+			]);
+		} else if (t.isBooleanLiteral()) {
+			const literalValue = getValueOfBooleanLiteral(t);
+			return writeSimpleZodValidator(f, 'literal', [
+				literalValue ? f.createTrue() : f.createFalse(),
+			]);
+		}
+	} else if (isBigIntLiteral(t)) {
+		return writeSimpleZodValidator(f, 'literal', [
+			f.createBigIntLiteral(t.getLiteralValue() as ts.PseudoBigInt),
+		]);
 	}
 	return f.createStringLiteral(t.getText());
 }
@@ -62,13 +84,17 @@ function writeUnionType(f: ts.NodeFactory, t: Type<ts.Type>) {
 	);
 }
 
-function writeSimpleZodValidator(f: ts.NodeFactory, validatorName: string) {
+function writeSimpleZodValidator(
+	f: ts.NodeFactory,
+	validatorName: string,
+	argumentsArray?: ts.Expression[]
+) {
 	return f.createCallExpression(
 		f.createPropertyAccessExpression(
 			f.createIdentifier('z'),
 			f.createIdentifier(validatorName)
 		),
 		undefined,
-		[]
+		argumentsArray
 	);
 }

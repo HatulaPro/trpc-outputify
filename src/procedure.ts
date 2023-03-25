@@ -36,7 +36,6 @@ function getReturnTypeOfCallExpression(
 	const res = project
 		.getTypeChecker()
 		.getReturnTypeOfSignature(f.getSignature());
-	console.log(res.getFlags());
 	return res;
 }
 export function handleProcedure(

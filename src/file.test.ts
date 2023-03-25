@@ -149,4 +149,31 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.number() /* END GENERATED CONTENT */)'
 		);
 	});
+
+	it('Should unwrap the promise and set the output type to be `z.union([z.number(), z.literal("one"), z.literal("two")])`.', () => {
+		const f = project.createSourceFile(
+			'asdasd.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure
+					.output(z.object({z: z.string()}))
+					.query(async () => {
+						await new Promise((resolve) => setTimeout(resolve, 100));
+						return Math.random() < 0.5 ? 'one' : Math.random() < 0.5 ? 17n : Math.random();
+					}),
+			});
+			`,
+			{ overwrite: true }
+		);
+
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.union([z.number(), z.literal("one"), z.literal(17n)]) /* END GENERATED CONTENT */)'
+		);
+	});
 });
