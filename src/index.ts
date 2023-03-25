@@ -1,7 +1,7 @@
 import { Project, ScriptTarget } from 'ts-morph';
 import { handleFile } from './file';
 
-export const project = new Project({
+const project = new Project({
 	compilerOptions: {
 		tsConfigFilePath: './tsconfig.json',
 		strict: true,

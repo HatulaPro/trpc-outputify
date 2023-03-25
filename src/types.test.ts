@@ -1,5 +1,4 @@
-import { project } from './index';
-import { SyntaxKind } from 'ts-morph';
+import { Project, ScriptTarget, SyntaxKind } from 'ts-morph';
 import { describe, expect, it } from 'vitest';
 import {
 	getValueOfBooleanLiteral,
@@ -10,6 +9,13 @@ import {
 } from './types';
 
 describe('removePromiseFromType should turn Promise<T> into T', () => {
+	const project = new Project({
+		compilerOptions: {
+			tsConfigFilePath: './tsconfig.json',
+			strict: true,
+			target: ScriptTarget.ES2020,
+		},
+	});
 	it('should get the type inside the promise', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -60,6 +66,13 @@ describe('removePromiseFromType should turn Promise<T> into T', () => {
 });
 
 describe('getValueOfBooleanLiteral should work', () => {
+	const project = new Project({
+		compilerOptions: {
+			tsConfigFilePath: './tsconfig.json',
+			strict: true,
+			target: ScriptTarget.ES2020,
+		},
+	});
 	it('should return true', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -79,6 +92,13 @@ describe('getValueOfBooleanLiteral should work', () => {
 });
 
 describe('should detect values correctly should work', () => {
+	const project = new Project({
+		compilerOptions: {
+			tsConfigFilePath: './tsconfig.json',
+			strict: true,
+			target: ScriptTarget.ES2020,
+		},
+	});
 	it('should return true', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
