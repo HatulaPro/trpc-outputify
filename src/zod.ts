@@ -17,6 +17,24 @@ function writeZodTypeRecursive(f: ts.NodeFactory, t: Type<ts.Type>) {
 			undefined,
 			[]
 		);
+	} else if (t.isNumber()) {
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(
+				f.createIdentifier('z'),
+				f.createIdentifier('number')
+			),
+			undefined,
+			[]
+		);
+	} else if (t.isBoolean()) {
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(
+				f.createIdentifier('z'),
+				f.createIdentifier('boolean')
+			),
+			undefined,
+			[]
+		);
 	}
 	return f.createStringLiteral(t.getText());
 }

@@ -135,7 +135,7 @@ describe('Testing the entire transformation process', () => {
 					.output(z.object({z: z.string()}))
 					.query(async () => {
 						await new Promise((resolve) => setTimeout(resolve, 100));
-						return "bluh";
+						return 69420;
 					}),
 			});
 			`,
@@ -146,7 +146,7 @@ describe('Testing the entire transformation process', () => {
 		project.emitToMemory();
 		const text = f.getText();
 		expect(text).toContain(
-			'.output(/* BEGIN GENERATED CONTENT */ z.string() /* END GENERATED CONTENT */)'
+			'.output(/* BEGIN GENERATED CONTENT */ z.number() /* END GENERATED CONTENT */)'
 		);
 	});
 });
