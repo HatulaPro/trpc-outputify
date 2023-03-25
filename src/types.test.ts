@@ -2,7 +2,7 @@ import { Project, SyntaxKind } from 'ts-morph';
 import { describe, expect, it } from 'vitest';
 import { removePromiseFromType } from './types';
 
-describe('removePromiseFromType should turn Promist<T> into T', () => {
+describe('removePromiseFromType should turn Promise<T> into T', () => {
 	const project = new Project({
 		compilerOptions: {
 			tsConfigFilePath: './tsconfig.json',
