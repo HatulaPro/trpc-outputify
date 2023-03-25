@@ -8,12 +8,11 @@ t.router({
     return m.next({ ctx: m.ctx });
 })
     .input(z.string())
-    .output(/* BEGIN GENERATED CONTENT */ z.literal(false) /* END GENERATED CONTENT */)
+    .output(/* BEGIN GENERATED CONTENT */ z.date() /* END GENERATED CONTENT */)
 		.use((m) => {
 			return m.next({ ctx: m.ctx });
 		})
-		.query(async () => {
-			await new Promise((resolve) => setTimeout(resolve, 100));
-			return false as const;
+		.query(() => {
+			return new Date();
 		}),
 });

@@ -176,4 +176,35 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.union([z.number(), z.literal("one"), z.literal(17n)]) /* END GENERATED CONTENT */)'
 		);
 	});
+
+	it('Should set the output type to be `z.date()`.', () => {
+		const f = project.createSourceFile(
+			'asdasd.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure
+					.output(z.object({z: z.string()}))
+					.query(() => {
+						class Date {
+							thing: number;
+			
+							constructor() {
+								this.thing = 12;
+							}
+						}
+						return new Date();
+					}),
+			});
+			`,
+			{ overwrite: true }
+		);
+
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).not.contain('z.date()');
+	});
 });

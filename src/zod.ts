@@ -2,6 +2,7 @@ import { ts, type Type, SyntaxKind, TypeFlags } from 'ts-morph';
 import {
 	getValueOfBooleanLiteral,
 	isBigIntLiteral,
+	isDateType,
 	removePromiseFromType,
 } from './types';
 
@@ -49,6 +50,8 @@ function writeZodTypeRecursive(
 		return writeSimpleZodValidator(f, 'literal', [
 			f.createBigIntLiteral(t.getLiteralValue() as ts.PseudoBigInt),
 		]);
+	} else if (isDateType(t)) {
+		return writeSimpleZodValidator(f, 'date');
 	}
 	return f.createStringLiteral(t.getText());
 }
