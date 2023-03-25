@@ -12,85 +12,21 @@ function writeZodTypeRecursive(
 	t: Type<ts.Type>
 ): ts.Expression {
 	if (t.isString()) {
-		return f.createCallExpression(
-			f.createPropertyAccessExpression(
-				f.createIdentifier('z'),
-				f.createIdentifier('string')
-			),
-			undefined,
-			[]
-		);
+		return writeSimpleZodValidator(f, 'string');
 	} else if (t.isNumber()) {
-		return f.createCallExpression(
-			f.createPropertyAccessExpression(
-				f.createIdentifier('z'),
-				f.createIdentifier('number')
-			),
-			undefined,
-			[]
-		);
+		return writeSimpleZodValidator(f, 'number');
 	} else if (t.isBoolean()) {
-		return f.createCallExpression(
-			f.createPropertyAccessExpression(
-				f.createIdentifier('z'),
-				f.createIdentifier('boolean')
-			),
-			undefined,
-			[]
-		);
+		return writeSimpleZodValidator(f, 'boolean');
 	} else if ((t.getFlags() & TypeFlags.BigInt) === TypeFlags.BigInt) {
-		return f.createCallExpression(
-			f.createPropertyAccessExpression(
-				f.createIdentifier('z'),
-				f.createIdentifier('bigint')
-			),
-			undefined,
-			[]
-		);
+		return writeSimpleZodValidator(f, 'bigint');
 	} else if (t.isNull()) {
-		return f.createCallExpression(
-			f.createPropertyAccessExpression(
-				f.createIdentifier('z'),
-				f.createIdentifier('null')
-			),
-			undefined,
-			[]
-		);
+		return writeSimpleZodValidator(f, 'null');
 	} else if (t.isUndefined()) {
-		return f.createCallExpression(
-			f.createPropertyAccessExpression(
-				f.createIdentifier('z'),
-				f.createIdentifier('undefined')
-			),
-			undefined,
-			[]
-		);
+		return writeSimpleZodValidator(f, 'undefined');
 	} else if (t.isAny()) {
-		return f.createCallExpression(
-			f.createPropertyAccessExpression(
-				f.createIdentifier('z'),
-				f.createIdentifier('any')
-			),
-			undefined,
-			[]
-		);
+		return writeSimpleZodValidator(f, 'any');
 	} else if (t.isUnion()) {
-		const unionTypes = t.getUnionTypes();
-		return f.createCallExpression(
-			f.createPropertyAccessExpression(
-				f.createIdentifier('z'),
-				f.createIdentifier('union')
-			),
-			undefined,
-			[
-				f.createArrayLiteralExpression(
-					unionTypes.map((unionType) =>
-						writeZodTypeRecursive(f, unionType)
-					),
-					false
-				),
-			]
-		);
+		return writeUnionType(f, t);
 	}
 	return f.createStringLiteral(t.getText());
 }
@@ -104,5 +40,35 @@ function wrapWithComments(node: ts.Expression) {
 		),
 		SyntaxKind.MultiLineCommentTrivia,
 		' END GENERATED CONTENT '
+	);
+}
+
+function writeUnionType(f: ts.NodeFactory, t: Type<ts.Type>) {
+	const unionTypes = t.getUnionTypes();
+	return f.createCallExpression(
+		f.createPropertyAccessExpression(
+			f.createIdentifier('z'),
+			f.createIdentifier('union')
+		),
+		undefined,
+		[
+			f.createArrayLiteralExpression(
+				unionTypes.map((unionType) =>
+					writeZodTypeRecursive(f, unionType)
+				),
+				false
+			),
+		]
+	);
+}
+
+function writeSimpleZodValidator(f: ts.NodeFactory, validatorName: string) {
+	return f.createCallExpression(
+		f.createPropertyAccessExpression(
+			f.createIdentifier('z'),
+			f.createIdentifier(validatorName)
+		),
+		undefined,
+		[]
 	);
 }
