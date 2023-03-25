@@ -27,8 +27,37 @@ export function getValueOfBooleanLiteral(t: Type<ts.Type>) {
 export function isDateType(t: Type<ts.Type>) {
 	if (
 		t.getSymbol()?.getEscapedName() === 'Date' &&
+		t.getProperty('toUTCString') &&
+		t.getProperty('toISOString') &&
 		t.getProperty('getDate') &&
 		t.getProperty('getTime')
+	) {
+		return true;
+	}
+	return false;
+}
+
+export function isSetType(t: Type<ts.Type>) {
+	// console.log(t);
+	if (
+		t.getSymbol()?.getEscapedName() === 'Set' &&
+		t.getProperty('add') &&
+		t.getProperty('has') &&
+		t.getProperty('forEach') &&
+		t.getProperty('delete')
+	) {
+		return true;
+	}
+	return false;
+}
+
+export function isMapType(t: Type<ts.Type>) {
+	if (
+		t.getSymbol()?.getEscapedName() === 'Map' &&
+		t.getProperty('set') &&
+		t.getProperty('has') &&
+		t.getProperty('forEach') &&
+		t.getProperty('delete')
 	) {
 		return true;
 	}
