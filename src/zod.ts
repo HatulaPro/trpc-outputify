@@ -1,4 +1,4 @@
-import { ts, type Type, SyntaxKind } from 'ts-morph';
+import { ts, type Type, SyntaxKind, TypeFlags } from 'ts-morph';
 import { removePromiseFromType } from './types';
 
 export function writeZodType(f: ts.NodeFactory, t: Type<ts.Type>) {
@@ -31,6 +31,42 @@ function writeZodTypeRecursive(f: ts.NodeFactory, t: Type<ts.Type>) {
 			f.createPropertyAccessExpression(
 				f.createIdentifier('z'),
 				f.createIdentifier('boolean')
+			),
+			undefined,
+			[]
+		);
+	} else if ((t.getFlags() & TypeFlags.BigInt) === TypeFlags.BigInt) {
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(
+				f.createIdentifier('z'),
+				f.createIdentifier('bigint')
+			),
+			undefined,
+			[]
+		);
+	} else if (t.isNull()) {
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(
+				f.createIdentifier('z'),
+				f.createIdentifier('null')
+			),
+			undefined,
+			[]
+		);
+	} else if (t.isUndefined()) {
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(
+				f.createIdentifier('z'),
+				f.createIdentifier('undefined')
+			),
+			undefined,
+			[]
+		);
+	} else if (t.isAny()) {
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(
+				f.createIdentifier('z'),
+				f.createIdentifier('any')
 			),
 			undefined,
 			[]

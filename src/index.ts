@@ -4,9 +4,9 @@ import { handleFile } from './file';
 const project = new Project({
 	compilerOptions: {
 		tsConfigFilePath: './tsconfig.json',
+		strict: true,
 	},
 });
-
 project.addSourceFilesFromTsConfig('./tsconfig.json');
 // const sourceFiles = project.getSourceFiles(["./src/server/api/routers/**.ts"]);
 const sourceFiles = project.getSourceFiles(['./src/playground.ts']);
