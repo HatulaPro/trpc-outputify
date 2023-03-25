@@ -234,4 +234,30 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.array(z.union([z.string(), z.number()])) /* END GENERATED CONTENT */)'
 		);
 	});
+
+	it('Should handle a readonly number array like a normal number array.', () => {
+		const f = project.createSourceFile(
+			'asdasd.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure
+					.output(z.object({z: z.string()}))
+					.query(() => {
+						return [1, 2, 3] as readonly number[];
+					}),
+			});
+			`,
+			{ overwrite: true }
+		);
+
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.array(z.number()) /* END GENERATED CONTENT */)'
+		);
+	});
 });
