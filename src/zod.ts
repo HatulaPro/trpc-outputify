@@ -1,7 +1,24 @@
 import { ts, type Type, SyntaxKind } from 'ts-morph';
+import { removePromiseFromType } from './types';
 
 export function writeZodType(f: ts.NodeFactory, t: Type<ts.Type>) {
-	return [wrapWithComments(f.createStringLiteral(t.getText()))];
+	// console.log(t);
+	const promised = removePromiseFromType(t);
+	return [wrapWithComments(writeZodTypeRecursive(f, promised))];
+}
+
+function writeZodTypeRecursive(f: ts.NodeFactory, t: Type<ts.Type>) {
+	if (t.isString()) {
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(
+				f.createIdentifier('z'),
+				f.createIdentifier('string')
+			),
+			undefined,
+			[]
+		);
+	}
+	return f.createStringLiteral(t.getText());
 }
 
 function wrapWithComments(node: ts.Expression) {
