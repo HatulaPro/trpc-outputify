@@ -11,20 +11,36 @@ import {
 	removePromiseFromType,
 } from './types';
 
+type ZodWriter = {
+	node: Node<ts.Node>;
+	f: ts.NodeFactory;
+	t: Type<ts.Type>;
+	depth: number;
+};
+
 export function writeZodType(
 	node: Node<ts.Node>,
 	f: ts.NodeFactory,
 	t: Type<ts.Type>
 ) {
 	const promised = removePromiseFromType(t);
-	return [wrapWithComments(writeZodTypeRecursive(node, f, promised))];
+	return [
+		wrapWithComments(
+			writeZodTypeRecursive({ node, f, t: promised, depth: 0 })
+		),
+	];
 }
 
-function writeZodTypeRecursive(
-	node: Node<ts.Node>,
-	f: ts.NodeFactory,
-	t: Type<ts.Type>
-): ts.Expression {
+function writeZodTypeRecursive({
+	node,
+	f,
+	t,
+	depth,
+}: ZodWriter): ts.Expression {
+	if (depth > 50) {
+		throw new Error('Can not handle recursive types');
+	}
+	depth++;
 	if (isFunction(t)) {
 		throw new Error('Can not serialize functions');
 	}
@@ -43,7 +59,7 @@ function writeZodTypeRecursive(
 	} else if (t.isAny()) {
 		return writeSimpleZodValidator(f, 'any');
 	} else if (t.isUnion()) {
-		return writeUnionType(node, f, t);
+		return writeUnionType({ node, f, t, depth });
 	} else if (t.isLiteral()) {
 		if (t.isNumberLiteral()) {
 			return writeSimpleZodValidator(f, 'literal', [
@@ -64,17 +80,17 @@ function writeZodTypeRecursive(
 			f.createBigIntLiteral(t.getLiteralValue() as ts.PseudoBigInt),
 		]);
 	} else if (t.isArray()) {
-		return writeArrayType(node, f, t);
+		return writeArrayType({ node, f, t, depth });
 	} else if (t.isTuple()) {
-		return writeTupleType(node, f, t);
+		return writeTupleType({ node, f, t, depth });
 	} else if (isDateType(t)) {
 		return writeSimpleZodValidator(f, 'date');
 	} else if (isSetType(t)) {
-		return writeSetType(node, f, t);
+		return writeSetType({ node, f, t, depth });
 	} else if (isMapType(t)) {
-		return writeMapType(node, f, t);
+		return writeMapType({ node, f, t, depth });
 	} else if (t.isObject()) {
-		return writeObjectType(node, f, t);
+		return writeObjectType({ node, f, t, depth });
 	}
 	return f.createStringLiteral(t.getText());
 }
@@ -103,11 +119,8 @@ function wrapWithModifier(
 	);
 }
 
-function writeUnionType(
-	node: Node<ts.Node>,
-	f: ts.NodeFactory,
-	t: Type<ts.Type>
-) {
+function writeUnionType({ node, f, t, depth }: ZodWriter) {
+	depth++;
 	const unionTypes = t.getUnionTypes();
 	const hasNull = unionTypes.find((type) => type.isNull());
 	const hasUndefined = unionTypes.find((type) => type.isUndefined());
@@ -125,8 +138,13 @@ function writeUnionType(
 
 	const currentZodType =
 		filteredUnionTypes.length === 1
-			? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			  writeZodTypeRecursive(node, f, filteredUnionTypes[0]!)
+			? writeZodTypeRecursive({
+					node,
+					f,
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					t: filteredUnionTypes[0]!,
+					depth,
+			  })
 			: f.createCallExpression(
 					f.createPropertyAccessExpression(
 						f.createIdentifier('z'),
@@ -136,7 +154,12 @@ function writeUnionType(
 					[
 						f.createArrayLiteralExpression(
 							filteredUnionTypes.map((unionType) =>
-								writeZodTypeRecursive(node, f, unionType)
+								writeZodTypeRecursive({
+									node,
+									f,
+									t: unionType,
+									depth,
+								})
 							),
 							false
 						),
@@ -155,15 +178,12 @@ function writeUnionType(
 	return currentZodType;
 }
 
-function writeArrayType(
-	node: Node<ts.Node>,
-	f: ts.NodeFactory,
-	t: Type<ts.Type>
-) {
+function writeArrayType({ node, f, t, depth }: ZodWriter) {
+	depth++;
 	const elType = t.getArrayElementType();
 	if (elType) {
 		return writeSimpleZodValidator(f, 'array', [
-			writeZodTypeRecursive(node, f, elType),
+			writeZodTypeRecursive({ node, f, t: elType, depth }),
 		]);
 	} else {
 		return writeSimpleZodValidator(f, 'array', [
@@ -172,11 +192,8 @@ function writeArrayType(
 	}
 }
 
-function writeTupleType(
-	node: Node<ts.Node>,
-	f: ts.NodeFactory,
-	t: Type<ts.Type>
-) {
+function writeTupleType({ node, f, t, depth }: ZodWriter) {
+	depth++;
 	const elsAndFlags = getTupleElementsAndFlags(t);
 	const restType =
 		elsAndFlags[elsAndFlags.length - 1]?.flag === ElementFlags.Rest
@@ -190,7 +207,7 @@ function writeTupleType(
 	const mainElementsExpression = writeSimpleZodValidator(f, 'tuple', [
 		f.createArrayLiteralExpression(
 			elsAndFlags.map(({ element }) =>
-				writeZodTypeRecursive(node, f, element)
+				writeZodTypeRecursive({ node, f, t: element, depth })
 			)
 		),
 	]);
@@ -198,22 +215,19 @@ function writeTupleType(
 		return f.createCallExpression(
 			f.createPropertyAccessExpression(mainElementsExpression, 'rest'),
 			[],
-			[writeZodTypeRecursive(node, f, restType.element)]
+			[writeZodTypeRecursive({ node, f, t: restType.element, depth })]
 		);
 	}
 
 	return mainElementsExpression;
 }
 
-function writeSetType(
-	node: Node<ts.Node>,
-	f: ts.NodeFactory,
-	t: Type<ts.Type>
-) {
+function writeSetType({ node, f, t, depth }: ZodWriter) {
+	depth++;
 	const elType = t.getTypeArguments()[0];
 	if (elType) {
 		return writeSimpleZodValidator(f, 'set', [
-			writeZodTypeRecursive(node, f, elType),
+			writeZodTypeRecursive({ node, f, t: elType, depth }),
 		]);
 	} else {
 		return writeSimpleZodValidator(f, 'set', [
@@ -222,16 +236,13 @@ function writeSetType(
 	}
 }
 
-function writeMapType(
-	node: Node<ts.Node>,
-	f: ts.NodeFactory,
-	t: Type<ts.Type>
-) {
+function writeMapType({ node, f, t, depth }: ZodWriter) {
+	depth++;
 	const [elKeyType, elValueType] = t.getTypeArguments();
 	if (elKeyType && elValueType) {
 		return writeSimpleZodValidator(f, 'map', [
-			writeZodTypeRecursive(node, f, elKeyType),
-			writeZodTypeRecursive(node, f, elValueType),
+			writeZodTypeRecursive({ node, f, t: elKeyType, depth }),
+			writeZodTypeRecursive({ node, f, t: elValueType, depth }),
 		]);
 	} else {
 		return writeSimpleZodValidator(f, 'map', [
@@ -241,11 +252,8 @@ function writeMapType(
 	}
 }
 
-function writeObjectType(
-	node: Node<ts.Node>,
-	f: ts.NodeFactory,
-	t: Type<ts.Type>
-) {
+function writeObjectType({ node, f, t, depth }: ZodWriter) {
+	depth++;
 	const propertiesAndTypes = t
 		.getProperties()
 		.map((x) => [x.getName(), x.getTypeAtLocation(node)] as const);
@@ -255,7 +263,7 @@ function writeObjectType(
 			propertiesAndTypes.map(([propName, type]) =>
 				f.createPropertyAssignment(
 					f.createIdentifier(propName),
-					writeZodTypeRecursive(node, f, type)
+					writeZodTypeRecursive({ node, f, t: type, depth })
 				)
 			)
 		),
