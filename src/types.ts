@@ -56,7 +56,6 @@ export function isDateType(t: Type<ts.Type>) {
 }
 
 export function isSetType(t: Type<ts.Type>) {
-	// console.log(t);
 	if (
 		t.getSymbol()?.getEscapedName() === 'Set' &&
 		t.getProperty('add') &&
