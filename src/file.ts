@@ -1,4 +1,4 @@
-import type { Project, SourceFile } from 'ts-morph';
+import { type Project, type SourceFile } from 'ts-morph';
 import { handleProcedure } from './procedure';
 import { Travelers } from './travelers';
 
@@ -38,7 +38,26 @@ export function handleFile(p: Project) {
 		});
 		// If file changed, format it
 		if (!sourceFile.isSaved()) {
+			addZodImportIfNotExists(sourceFile);
 			sourceFile.formatText();
 		}
 	};
+}
+
+function addZodImportIfNotExists(sourceFile: SourceFile) {
+	const declaration = sourceFile.getImportDeclaration((importDeclaration) => {
+		return (
+			importDeclaration
+				.getNamedImports()
+				.map((x) => x.getName())
+				.includes('z') &&
+			importDeclaration.getModuleSpecifierValue() === 'zod'
+		);
+	});
+	if (!declaration) {
+		sourceFile.addImportDeclaration({
+			moduleSpecifier: 'zod',
+			namedImports: ['z'],
+		});
+	}
 }
