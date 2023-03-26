@@ -28,15 +28,15 @@ function getReturnTypeOfCallExpression(
 
 	if (!Node.isFunctionLikeDeclaration(f)) {
 		if (Node.isIdentifier(f)) {
-			return f.getType();
+			const func = f.getType();
+			const [signature] = func.getCallSignatures();
+			if (!signature) return;
+			return project.getTypeChecker().getReturnTypeOfSignature(signature);
 		}
 		return;
 	}
 
-	const res = project
-		.getTypeChecker()
-		.getReturnTypeOfSignature(f.getSignature());
-	return res;
+	return project.getTypeChecker().getReturnTypeOfSignature(f.getSignature());
 }
 export function handleProcedure(
 	project: Project,

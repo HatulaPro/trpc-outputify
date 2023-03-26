@@ -2,15 +2,17 @@ import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
 
 const t = initTRPC.context().create();
+function f() {
+	return {
+		x: 1,
+	};
+}
 t.router({
-	myProc: t.procedure.query(() => {
-		return {
-			z: 'asd',
-			y: new Set([1, 2, 3]),
-			x: new Map([
-				['hey', 1],
-				['wow', 2],
-			]),
-		};
-	}),
+	myProc: t.procedure
+		.output(
+			/* BEGIN GENERATED CONTENT */ z.object({
+				x: z.number(),
+			}) /* END GENERATED CONTENT */
+		)
+		.query(f),
 });
