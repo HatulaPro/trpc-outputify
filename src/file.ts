@@ -55,6 +55,11 @@ function addZodImportIfNotExists(sourceFile: SourceFile) {
 		);
 	});
 	if (!declaration) {
+		if (sourceFile.getLocal('z')) {
+			throw new Error(
+				'Can not import zod: symbol `z` is already defined.'
+			);
+		}
 		sourceFile.addImportDeclaration({
 			moduleSpecifier: 'zod',
 			namedImports: ['z'],
