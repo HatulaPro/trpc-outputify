@@ -1,5 +1,7 @@
-import { ts, type Type, SyntaxKind, TypeFlags, Node } from 'ts-morph';
+import { ts, type Type, SyntaxKind, TypeFlags, type Node } from 'ts-morph';
+import { ElementFlags } from 'typescript';
 import {
+	getTupleElementsAndFlags,
 	getValueOfBooleanLiteral,
 	isBigIntLiteral,
 	isDateType,
@@ -175,8 +177,32 @@ function writeTupleType(
 	f: ts.NodeFactory,
 	t: Type<ts.Type>
 ) {
-	throw new Error('Can not handle tuples yet.');
-	return writeSimpleZodValidator(f, 'tuple');
+	const elsAndFlags = getTupleElementsAndFlags(t);
+	const restType =
+		elsAndFlags[elsAndFlags.length - 1]?.flag === ElementFlags.Rest
+			? elsAndFlags.pop()
+			: undefined;
+
+	if (elsAndFlags.find(({ flag }) => flag !== ElementFlags.Required)) {
+		throw new Error('Complex tuples are not supported by zod (or us)');
+	}
+
+	const mainElementsExpression = writeSimpleZodValidator(f, 'tuple', [
+		f.createArrayLiteralExpression(
+			elsAndFlags.map(({ element }) =>
+				writeZodTypeRecursive(node, f, element)
+			)
+		),
+	]);
+	if (restType) {
+		return f.createCallExpression(
+			f.createPropertyAccessExpression(mainElementsExpression, 'rest'),
+			[],
+			[writeZodTypeRecursive(node, f, restType.element)]
+		);
+	}
+
+	return mainElementsExpression;
 }
 
 function writeSetType(

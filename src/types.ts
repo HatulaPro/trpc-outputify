@@ -19,10 +19,14 @@ export function getTupleElementsAndFlags(t: Type<ts.Type>) {
 	const elementFlags = ((t.compilerType as any)?.target)
 		.elementFlags as ElementFlags[];
 	if (Array.isArray(elementFlags) && elementFlags.length === elements.length)
-		return elementFlags.map((flag, index) => ({
-			element: elements[index],
-			flag,
-		}));
+		return elementFlags.map((flag, index) => {
+			if (!elements[index]) throw new Error('Can not parse tuple');
+			return {
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				element: elements[index]!,
+				flag,
+			};
+		});
 	throw new Error('Not a tuple');
 }
 
