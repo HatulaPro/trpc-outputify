@@ -87,27 +87,68 @@ function wrapWithComments(node: ts.Expression) {
 	);
 }
 
+function wrapWithModifier(
+	node: ts.Expression,
+	f: ts.NodeFactory,
+	modifier: string
+) {
+	return f.createCallExpression(
+		f.createPropertyAccessExpression(node, modifier),
+		[],
+		[]
+	);
+}
+
 function writeUnionType(
 	node: Node<ts.Node>,
 	f: ts.NodeFactory,
 	t: Type<ts.Type>
 ) {
 	const unionTypes = t.getUnionTypes();
-	return f.createCallExpression(
-		f.createPropertyAccessExpression(
-			f.createIdentifier('z'),
-			f.createIdentifier('union')
-		),
-		undefined,
-		[
-			f.createArrayLiteralExpression(
-				unionTypes.map((unionType) =>
-					writeZodTypeRecursive(node, f, unionType)
-				),
-				false
-			),
-		]
+	const hasNull = unionTypes.find((type) => type.isNull());
+	const hasUndefined = unionTypes.find((type) => type.isUndefined());
+	const filteredUnionTypes = unionTypes.filter(
+		(type) => !type.isNull() && !type.isUndefined()
 	);
+
+	if (filteredUnionTypes.length === 0) {
+		return wrapWithModifier(
+			writeSimpleZodValidator(f, 'undefined'),
+			f,
+			'nullable'
+		);
+	}
+
+	const currentZodType =
+		filteredUnionTypes.length === 1
+			? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			  writeZodTypeRecursive(node, f, filteredUnionTypes[0]!)
+			: f.createCallExpression(
+					f.createPropertyAccessExpression(
+						f.createIdentifier('z'),
+						f.createIdentifier('union')
+					),
+					undefined,
+					[
+						f.createArrayLiteralExpression(
+							filteredUnionTypes.map((unionType) =>
+								writeZodTypeRecursive(node, f, unionType)
+							),
+							false
+						),
+					]
+			  );
+
+	if (hasNull && hasUndefined) {
+		return wrapWithModifier(currentZodType, f, 'nullish');
+	}
+	if (hasNull) {
+		return wrapWithModifier(currentZodType, f, 'nullable');
+	}
+	if (hasUndefined) {
+		return wrapWithModifier(currentZodType, f, 'optional');
+	}
+	return currentZodType;
 }
 
 function writeArrayType(
