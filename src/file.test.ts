@@ -383,4 +383,32 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.tuple([z.number(), z.literal(false)]).rest(z.string()) /* END GENERATED CONTENT */)'
 		);
 	});
+
+	it('Should ignore the marked procedure and update the unmarked procedure.', () => {
+		const f = project.createSourceFile(
+			'1234.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure.query(
+					/* @outputify-ignore */ () => {
+						return Math.random();
+					}
+				),
+				myOtherProc: t.procedure.query(() => "HELLO"),
+			});`,
+			{ overwrite: true }
+		);
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).not.toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.number() /* END GENERATED CONTENT */)'
+		);
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.string() /* END GENERATED CONTENT */)'
+		);
+	});
 });

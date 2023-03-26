@@ -20,11 +20,27 @@ export type ProcedureNode = {
 };
 const procedures = ['publicProcedure', 'protectedProcedure', 'procedure'];
 
+function shouldIgnoreProcedure(f: Node<ts.Node> | undefined) {
+	if (!f) return true;
+
+	const comments = f.getLeadingCommentRanges();
+
+	if (
+		comments.some((comment) =>
+			comment.getText().includes('@outputify-ignore')
+		)
+	) {
+		return true;
+	}
+	return false;
+}
+
 function getReturnTypeOfCallExpression(
 	project: Project,
 	expr: CallExpression<ts.CallExpression>
 ) {
 	const f = expr.getArguments()[0];
+	if (shouldIgnoreProcedure(f)) return;
 
 	if (!Node.isFunctionLikeDeclaration(f)) {
 		if (Node.isIdentifier(f)) {
