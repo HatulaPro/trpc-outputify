@@ -1,6 +1,8 @@
 import { Project, ScriptTarget, SyntaxKind } from 'ts-morph';
+import { ElementFlags } from 'typescript';
 import { describe, expect, it } from 'vitest';
 import {
+	getTupleElementsAndFlags,
 	getValueOfBooleanLiteral,
 	isDateType,
 	isMapType,
@@ -129,5 +131,70 @@ describe('should detect values correctly should work', () => {
 		expect(isMapType(shouldBeDate)).toBe(false);
 		expect(isMapType(shouldBeSet)).toBe(false);
 		expect(isMapType(shouldBeMap)).toBe(true);
+	});
+});
+
+describe('should detect tuple values correctly', () => {
+	const project = new Project({
+		compilerOptions: {
+			tsConfigFilePath: './tsconfig.json',
+			strict: true,
+			target: ScriptTarget.ES2020,
+		},
+	});
+
+	it('should detect a standard tuple', () => {
+		const f = project.createSourceFile(
+			'newfile.ts',
+			`const x = [1, 'bluh'] as [number, string];`,
+			{ overwrite: true }
+		);
+
+		const tuple = f.getFirstDescendantByKindOrThrow(
+			SyntaxKind.VariableDeclaration
+		);
+		const elsAndFlags = getTupleElementsAndFlags(tuple.getType());
+		expect(elsAndFlags).length(2);
+		expect(elsAndFlags[0]?.element?.getText()).toBe('number');
+		expect(elsAndFlags[1]?.element?.getText()).toBe('string');
+		expect(elsAndFlags[0]?.flag).toBe(ElementFlags.Required);
+		expect(elsAndFlags[1]?.flag).toBe(ElementFlags.Required);
+	});
+
+	it('should detect a tuple with an optional element', () => {
+		const f = project.createSourceFile(
+			'newfile.ts',
+			`const x = [1, 'bluh', true?] as [number, string, boolean?];`,
+			{ overwrite: true }
+		);
+
+		const tuple = f.getFirstDescendantByKindOrThrow(
+			SyntaxKind.VariableDeclaration
+		);
+		const elsAndFlags = getTupleElementsAndFlags(tuple.getType());
+		expect(elsAndFlags).length(3);
+		expect(elsAndFlags[0]?.element?.getText()).toBe('number');
+		expect(elsAndFlags[1]?.element?.getText()).toBe('string');
+		expect(elsAndFlags[2]?.element?.getText()).toBe('boolean | undefined');
+		expect(elsAndFlags[0]?.flag).toBe(ElementFlags.Required);
+		expect(elsAndFlags[1]?.flag).toBe(ElementFlags.Required);
+		expect(elsAndFlags[2]?.flag).toBe(ElementFlags.Optional);
+	});
+
+	it('should detect a tuple with rest elements', () => {
+		const f = project.createSourceFile(
+			'newfile.ts',
+			`const x = [1, 'a', 'b', 'c'] as [number, ...string[]];`,
+			{ overwrite: true }
+		);
+
+		const tuple = f.getFirstDescendantByKindOrThrow(
+			SyntaxKind.VariableDeclaration
+		);
+		const elsAndFlags = getTupleElementsAndFlags(tuple.getType());
+		expect(elsAndFlags).length(2);
+		expect(elsAndFlags[0]?.element?.getText()).toBe('number');
+		expect(elsAndFlags[1]?.element?.getText()).toBe('string');
+		expect(elsAndFlags[1]?.flag).toBe(ElementFlags.Rest);
 	});
 });

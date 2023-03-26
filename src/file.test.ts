@@ -341,4 +341,25 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.object({ x: z.number(), y: z.number().optional() }).nullable() /* END GENERATED CONTENT */)'
 		);
 	});
+
+	it('Should handle tuples correctly.', () => {
+		const f = project.createSourceFile(
+			'1234.ts',
+			`import { initTRPC } from '@trpc/server';
+
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure.query(() => {
+					return [Math.random(), Math.random().toString()] as const;
+				}),
+			});`,
+			{ overwrite: true }
+		);
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.tuple([z.number(), z.string()]).nullable() /* END GENERATED CONTENT */)'
+		);
+	});
 });

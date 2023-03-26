@@ -1,4 +1,4 @@
-import { ts, type Type, SyntaxKind, TypeFlags, type Node } from 'ts-morph';
+import { ts, type Type, SyntaxKind, TypeFlags, Node } from 'ts-morph';
 import {
 	getValueOfBooleanLiteral,
 	isBigIntLiteral,
@@ -63,6 +63,8 @@ function writeZodTypeRecursive(
 		]);
 	} else if (t.isArray()) {
 		return writeArrayType(node, f, t);
+	} else if (t.isTuple()) {
+		return writeTupleType(node, f, t);
 	} else if (isDateType(t)) {
 		return writeSimpleZodValidator(f, 'date');
 	} else if (isSetType(t)) {
@@ -166,6 +168,15 @@ function writeArrayType(
 			writeSimpleZodValidator(f, 'any'),
 		]);
 	}
+}
+
+function writeTupleType(
+	node: Node<ts.Node>,
+	f: ts.NodeFactory,
+	t: Type<ts.Type>
+) {
+	throw new Error('Can not handle tuples yet.');
+	return writeSimpleZodValidator(f, 'tuple');
 }
 
 function writeSetType(

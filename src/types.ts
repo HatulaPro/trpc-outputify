@@ -1,4 +1,5 @@
 import { TypeFlags, type ts, type Type } from 'ts-morph';
+import type { ElementFlags } from 'typescript';
 
 export function removePromiseFromType(t: Type<ts.Type>) {
 	if (
@@ -10,6 +11,19 @@ export function removePromiseFromType(t: Type<ts.Type>) {
 	}
 
 	return t;
+}
+
+export function getTupleElementsAndFlags(t: Type<ts.Type>) {
+	const elements = t.getTupleElements();
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+	const elementFlags = ((t.compilerType as any)?.target)
+		.elementFlags as ElementFlags[];
+	if (Array.isArray(elementFlags) && elementFlags.length === elements.length)
+		return elementFlags.map((flag, index) => ({
+			element: elements[index],
+			flag,
+		}));
+	throw new Error('Not a tuple');
 }
 
 export function isBigIntLiteral(t: Type<ts.Type>) {
