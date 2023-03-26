@@ -36,5 +36,9 @@ export function handleFile(p: Project) {
 				}
 			});
 		});
+		// If file changed, format it
+		if (!sourceFile.isSaved()) {
+			sourceFile.formatText();
+		}
 	};
 }
