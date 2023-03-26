@@ -4,6 +4,8 @@ import {
 	isBigIntLiteral,
 	isDateType,
 	isFunction,
+	isMapType,
+	isSetType,
 	removePromiseFromType,
 } from './types';
 
@@ -63,6 +65,10 @@ function writeZodTypeRecursive(
 		return writeArrayType(node, f, t);
 	} else if (isDateType(t)) {
 		return writeSimpleZodValidator(f, 'date');
+	} else if (isSetType(t)) {
+		return writeSetType(node, f, t);
+	} else if (isMapType(t)) {
+		return writeMapType(node, f, t);
 	} else if (t.isObject()) {
 		return writeObjectType(node, f, t);
 	}
@@ -116,6 +122,42 @@ function writeArrayType(
 		]);
 	} else {
 		return writeSimpleZodValidator(f, 'array', [
+			writeSimpleZodValidator(f, 'any'),
+		]);
+	}
+}
+
+function writeSetType(
+	node: Node<ts.Node>,
+	f: ts.NodeFactory,
+	t: Type<ts.Type>
+) {
+	const elType = t.getTypeArguments()[0];
+	if (elType) {
+		return writeSimpleZodValidator(f, 'set', [
+			writeZodTypeRecursive(node, f, elType),
+		]);
+	} else {
+		return writeSimpleZodValidator(f, 'set', [
+			writeSimpleZodValidator(f, 'any'),
+		]);
+	}
+}
+
+function writeMapType(
+	node: Node<ts.Node>,
+	f: ts.NodeFactory,
+	t: Type<ts.Type>
+) {
+	const [elKeyType, elValueType] = t.getTypeArguments();
+	if (elKeyType && elValueType) {
+		return writeSimpleZodValidator(f, 'map', [
+			writeZodTypeRecursive(node, f, elKeyType),
+			writeZodTypeRecursive(node, f, elValueType),
+		]);
+	} else {
+		return writeSimpleZodValidator(f, 'map', [
+			writeSimpleZodValidator(f, 'any'),
 			writeSimpleZodValidator(f, 'any'),
 		]);
 	}

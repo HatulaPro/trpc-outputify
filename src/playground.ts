@@ -3,13 +3,14 @@ import { z } from 'zod';
 
 const t = initTRPC.context().create();
 t.router({
-	myProc: t.procedure
-		.output(
-			/* BEGIN GENERATED CONTENT */ z.object({
-				z: z.string(),
-			}) /* END GENERATED CONTENT */
-		)
-		.query(() => {
-			return { z: 'asd' };
-		}),
+	myProc: t.procedure.query(() => {
+		return {
+			z: 'asd',
+			y: new Set([1, 2, 3]),
+			x: new Map([
+				['hey', 1],
+				['wow', 2],
+			]),
+		};
+	}),
 });

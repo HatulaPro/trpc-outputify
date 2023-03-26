@@ -1,11 +1,10 @@
-import { Project, ScriptTarget } from 'ts-morph';
+import { Project } from 'ts-morph';
 import { handleFile } from './file';
 
 const project = new Project({
 	compilerOptions: {
 		tsConfigFilePath: './tsconfig.json',
 		strict: true,
-		target: ScriptTarget.ES2020,
 	},
 });
 project.addSourceFilesFromTsConfig('./tsconfig.json');
