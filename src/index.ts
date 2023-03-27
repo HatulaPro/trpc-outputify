@@ -13,4 +13,10 @@ function main() {
 	project.saveSync();
 }
 
-void main();
+try {
+	void main();
+} catch (e) {
+	if (e instanceof Error) {
+		console.error(e.message);
+	}
+}

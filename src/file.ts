@@ -4,12 +4,16 @@ import { handleProcedure } from './procedure';
 import { Travelers } from './travelers';
 
 export function createProject(tsConfigFilePath: string) {
-	const project = new Project({
-		tsConfigFilePath: tsConfigFilePath,
-	});
-	project.addSourceFilesFromTsConfig(tsConfigFilePath);
+	try {
+		const project = new Project({
+			tsConfigFilePath: tsConfigFilePath,
+		});
+		project.addSourceFilesFromTsConfig(tsConfigFilePath);
 
-	return project;
+		return project;
+	} catch {
+		throw new Error('error: Invalid TypeScript config file');
+	}
 }
 
 export function handleFile(p: Project, options: Options) {
