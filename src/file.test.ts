@@ -28,7 +28,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.input(z.string()).output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */)'
@@ -59,7 +59,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */).query'
@@ -84,7 +84,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */).query'
@@ -110,7 +110,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */)'
@@ -136,7 +136,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.string() /* END GENERATED CONTENT */)'
@@ -163,7 +163,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.number() /* END GENERATED CONTENT */)'
@@ -190,7 +190,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.union([z.number(), z.literal("one"), z.literal(17n)]) /* END GENERATED CONTENT */)'
@@ -223,7 +223,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).not.contain('z.date()');
 	});
@@ -248,7 +248,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.array(z.union([z.string(), z.number()])) /* END GENERATED CONTENT */)'
@@ -273,7 +273,7 @@ describe('Testing the entire transformation process', () => {
 		);
 
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.array(z.number()) /* END GENERATED CONTENT */)'
@@ -329,7 +329,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.object({ x: z.number(), y: z.number().optional() }).nullable() /* END GENERATED CONTENT */)'
@@ -350,7 +350,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.tuple([z.number(), z.string()]) /* END GENERATED CONTENT */)'
@@ -371,7 +371,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.tuple([z.number(), z.literal(false)]).rest(z.string()) /* END GENERATED CONTENT */)'
@@ -396,7 +396,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).not.toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.number() /* END GENERATED CONTENT */)'
@@ -422,7 +422,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.enum(["A", "B"]) /* END GENERATED CONTENT */)'
@@ -445,7 +445,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).not.toContain('z.enum(');
 	});
@@ -468,7 +468,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 		handleFile(project)(f);
-		project.emitToMemory();
+		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
 			'.output(/* BEGIN GENERATED CONTENT */ z.union([z.literal(3), z.string()]) /* END GENERATED CONTENT */)'
