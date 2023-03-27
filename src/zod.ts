@@ -127,6 +127,9 @@ function writeUnionType({ node, f, t, depth }: ZodWriter) {
 	const filteredUnionTypes = unionTypes.filter(
 		(type) => !type.isNull() && !type.isUndefined()
 	);
+	const isStringLiteralsUnion = filteredUnionTypes.every((x) =>
+		x.isStringLiteral()
+	);
 
 	if (filteredUnionTypes.length === 0) {
 		return wrapWithModifier(
@@ -148,18 +151,24 @@ function writeUnionType({ node, f, t, depth }: ZodWriter) {
 			: f.createCallExpression(
 					f.createPropertyAccessExpression(
 						f.createIdentifier('z'),
-						f.createIdentifier('union')
+						f.createIdentifier(
+							isStringLiteralsUnion ? 'enum' : 'union'
+						)
 					),
 					undefined,
 					[
 						f.createArrayLiteralExpression(
 							filteredUnionTypes.map((unionType) =>
-								writeZodTypeRecursive({
-									node,
-									f,
-									t: unionType,
-									depth,
-								})
+								isStringLiteralsUnion
+									? f.createStringLiteral(
+											unionType.getLiteralValue() as string
+									  )
+									: writeZodTypeRecursive({
+											node,
+											f,
+											t: unionType,
+											depth,
+									  })
 							),
 							false
 						),

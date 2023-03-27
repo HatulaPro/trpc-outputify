@@ -411,4 +411,48 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.string() /* END GENERATED CONTENT */)'
 		);
 	});
+
+	it('Should treat string literals as a zod enum.', () => {
+		const f = project.createSourceFile(
+			'1234.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure.query(() => {
+					return Math.random() < 0.5 ? 'A' : 'B';
+				}),
+			});
+			`,
+			{ overwrite: true }
+		);
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.enum(["A", "B"]) /* END GENERATED CONTENT */)'
+		);
+	});
+
+	it('Should not treat a union with string literals as a zod enum.', () => {
+		const f = project.createSourceFile(
+			'1234.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure.query(() => {
+					return Math.random() < 0.5 ? 'A' : Math.random() < 0.5 ? 'B' : Math.random();
+				}),
+			});
+			`,
+			{ overwrite: true }
+		);
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).not.toContain('z.enum(');
+	});
 });
