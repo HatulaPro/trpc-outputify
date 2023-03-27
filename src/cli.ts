@@ -8,7 +8,7 @@ export type Options = {
 export const defaultOptions = {
 	procedures: ['publicProcedure', 'protectedProcedure', 'procedure'],
 	tsConfigFilePath: './tsconfig.json',
-	files: './',
+	files: './src/**.ts',
 } satisfies Options;
 
 export function parseArgs() {
@@ -17,7 +17,7 @@ export function parseArgs() {
 		.description(
 			'A simple tool to automatically add output validators to tRPC procedures'
 		)
-		.argument('<files>', 'Glob pattern to find files')
+		.argument('[files]', 'Glob pattern to find files')
 		.version('0.0.1', '-v, --version', 'Display the version number');
 
 	program
@@ -34,7 +34,8 @@ export function parseArgs() {
 	program.parse();
 
 	const options = program.opts();
-	defaultOptions.files = program.args[0] as string;
+	defaultOptions.files =
+		(program.args[0] as string | undefined) ?? defaultOptions.files;
 	defaultOptions.tsConfigFilePath = options.config as string;
 	defaultOptions.procedures = options.procedures as string[];
 
