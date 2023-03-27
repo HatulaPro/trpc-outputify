@@ -1,4 +1,3 @@
-/** @type {import("eslint").Linter.Config} */
 const config = {
 	overrides: [
 		{
@@ -32,4 +31,4 @@ const config = {
 	},
 };
 
-module.exports = config;
+export default config;
