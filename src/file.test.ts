@@ -449,4 +449,29 @@ describe('Testing the entire transformation process', () => {
 		const text = f.getText();
 		expect(text).not.toContain('z.enum(');
 	});
+
+	it('Should squash the union type', () => {
+		const f = project.createSourceFile(
+			'1234.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			type X = 3 | 'a' | 'b' | (string & {});
+			
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure.query(() => {
+					return 'a' as X;
+				}),
+			});
+			`,
+			{ overwrite: true }
+		);
+		handleFile(project)(f);
+		project.emitToMemory();
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.union([z.literal(3), z.string()]) /* END GENERATED CONTENT */)'
+		);
+	});
 });

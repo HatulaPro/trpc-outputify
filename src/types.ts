@@ -108,6 +108,32 @@ export function areAllSameEnumMembers(types: Type<ts.Type>[]) {
 	return parentEnum?.size === types.length ? parentIdentifier : undefined;
 }
 
+export function squashUnionTypes(types: Type<ts.Type>[]) {
+	const hasString = types.some((t) => t.isString() && !t.isStringLiteral());
+	const hasNumber = types.some((t) => t.isNumber() && !t.isNumberLiteral());
+
+	return types.filter((t) => {
+		if (hasString && t.isStringLiteral()) return false;
+		if (hasNumber && t.isNumberLiteral()) return false;
+		return true;
+	});
+}
+
+export function simplifyIntersectionType(t: Type<ts.Type>) {
+	if (!t.isIntersection()) return t;
+	const types = t.getIntersectionTypes();
+	if (types.length !== 2)
+		throw new Error('Can not handle complex intersections.');
+
+	const nonEmptyObject = types.find(
+		(type) => !(type.isObject() && type.getProperties().length === 0)
+	);
+	if (nonEmptyObject) {
+		return nonEmptyObject;
+	}
+	throw new Error('Can not handle complex intersections.');
+}
+
 export function isFunction(t: Type<ts.Type>) {
 	return t.getCallSignatures().length > 0;
 }

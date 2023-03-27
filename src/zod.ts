@@ -10,6 +10,8 @@ import {
 	isMapType,
 	isSetType,
 	removePromiseFromType,
+	simplifyIntersectionType,
+	squashUnionTypes,
 } from './types';
 
 type ZodWriter = {
@@ -92,6 +94,13 @@ function writeZodTypeRecursive({
 		return writeMapType({ node, f, t, depth });
 	} else if (t.isObject()) {
 		return writeObjectType({ node, f, t, depth });
+	} else if (t.isIntersection()) {
+		return writeZodTypeRecursive({
+			node,
+			f,
+			t: simplifyIntersectionType(t),
+			depth,
+		});
 	}
 	return f.createStringLiteral(t.getText());
 }
@@ -125,8 +134,10 @@ function writeUnionType({ node, f, t, depth }: ZodWriter) {
 	const unionTypes = t.getUnionTypes();
 	const hasNull = unionTypes.find((type) => type.isNull());
 	const hasUndefined = unionTypes.find((type) => type.isUndefined());
-	const filteredUnionTypes = unionTypes.filter(
-		(type) => !type.isNull() && !type.isUndefined()
+	const filteredUnionTypes = squashUnionTypes(
+		unionTypes
+			.filter((type) => !type.isNull() && !type.isUndefined())
+			.map(simplifyIntersectionType)
 	);
 	const isStringLiteralsUnion = filteredUnionTypes.every((x) =>
 		x.isStringLiteral()
