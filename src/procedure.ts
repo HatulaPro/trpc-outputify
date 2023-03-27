@@ -7,6 +7,7 @@ import {
 	type ts,
 	type Type,
 } from 'ts-morph';
+import { type Options } from './cli';
 
 export type ProcedureNode = {
 	node: CallExpression<ts.CallExpression>;
@@ -18,7 +19,6 @@ export type ProcedureNode = {
 	>;
 	returnType: Type<ts.Type>;
 };
-const procedures = ['publicProcedure', 'protectedProcedure', 'procedure'];
 
 function shouldIgnoreProcedure(f: Node<ts.Node> | undefined) {
 	if (!f) return true;
@@ -56,6 +56,7 @@ function getReturnTypeOfCallExpression(
 }
 export function handleProcedure(
 	project: Project,
+	options: Options,
 	node: Node<ts.Node>,
 	callback: (n: ProcedureNode) => void
 ) {
@@ -63,7 +64,8 @@ export function handleProcedure(
 	const child = node.getFirstChild();
 	if (Node.isPropertyAccessExpression(child)) {
 		const objectName = child.getExpression().getSymbol();
-		if (!objectName || !procedures.includes(objectName.getName())) return;
+		if (!objectName || !options.procedures.includes(objectName.getName()))
+			return;
 
 		const parent = node.getParentIfKind(
 			SyntaxKind.PropertyAccessExpression

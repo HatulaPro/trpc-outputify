@@ -13,8 +13,8 @@ import {
 	removePromiseFromType,
 } from './types';
 
+const project = createProject('./tsconfig.json');
 describe('removePromiseFromType should turn Promise<T> into T', () => {
-	const project = createProject();
 	it('should get the type inside the promise', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -65,7 +65,6 @@ describe('removePromiseFromType should turn Promise<T> into T', () => {
 });
 
 describe('getValueOfBooleanLiteral should work', () => {
-	const project = createProject();
 	it('should return true', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -85,7 +84,6 @@ describe('getValueOfBooleanLiteral should work', () => {
 });
 
 describe('should detect values correctly', () => {
-	const project = createProject();
 	it('should return the right types', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -131,8 +129,6 @@ describe('should detect values correctly', () => {
 });
 
 describe('should detect tuple values correctly', () => {
-	const project = createProject();
-
 	it('should detect a standard tuple', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -190,8 +186,6 @@ describe('should detect tuple values correctly', () => {
 });
 
 describe('should detect enum values correctly', () => {
-	const project = createProject();
-
 	it('should detect an all-enum situation', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',

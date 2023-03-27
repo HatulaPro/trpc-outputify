@@ -1,8 +1,16 @@
+import { parseArgs } from './cli';
 import { createProject, handleFile } from './file';
 
-const project = createProject();
-// const sourceFiles = project.getSourceFiles(["./src/server/api/routers/**.ts"]);
-const sourceFiles = project.getSourceFiles(['./src/playground.ts']);
+function main() {
+	const defaultOptions = parseArgs();
 
-sourceFiles.forEach(handleFile(project));
-project.saveSync();
+	const project = createProject(defaultOptions.tsConfigFilePath);
+
+	// const sourceFiles = project.getSourceFiles(['./src/playground.ts']);
+	const sourceFiles = project.getSourceFiles(defaultOptions.files);
+	sourceFiles.forEach(handleFile(project, defaultOptions));
+
+	project.saveSync();
+}
+
+void main();

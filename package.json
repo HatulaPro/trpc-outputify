@@ -13,6 +13,7 @@
 	"author": "Shalev Raz Israel",
 	"license": "ISC",
 	"devDependencies": {
+		"@types/node": "^18.15.10",
 		"@typescript-eslint/eslint-plugin": "^5.56.0",
 		"@typescript-eslint/parser": "^5.56.0",
 		"eslint": "^8.36.0",
@@ -22,6 +23,7 @@
 	},
 	"dependencies": {
 		"@trpc/server": "^10.18.0",
+		"commander": "^10.0.0",
 		"ts-morph": "^17.0.1",
 		"zod": "^3.21.4"
 	}

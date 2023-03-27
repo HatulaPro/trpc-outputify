@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { defaultOptions } from './cli';
 import { createProject, handleFile } from './file';
 
 describe('Testing the entire transformation process', () => {
-	const project = createProject();
+	const project = createProject('./tsconfig.json');
 	it('Should add an output right after the input', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -27,7 +28,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -58,7 +59,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -83,7 +84,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -109,7 +110,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -135,7 +136,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -162,7 +163,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -189,7 +190,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -222,7 +223,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).not.contain('z.date()');
@@ -247,7 +248,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -272,7 +273,7 @@ describe('Testing the entire transformation process', () => {
 			{ overwrite: true }
 		);
 
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -300,7 +301,7 @@ describe('Testing the entire transformation process', () => {
 			`,
 			{ overwrite: true }
 		);
-		expect(() => handleFile(project)(f)).toThrowError();
+		expect(() => handleFile(project, defaultOptions)(f)).toThrowError();
 	});
 
 	it('Should handle null, undefined and unions correctly.', () => {
@@ -328,7 +329,7 @@ describe('Testing the entire transformation process', () => {
 			`,
 			{ overwrite: true }
 		);
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -349,7 +350,7 @@ describe('Testing the entire transformation process', () => {
 			});`,
 			{ overwrite: true }
 		);
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -370,7 +371,7 @@ describe('Testing the entire transformation process', () => {
 			});`,
 			{ overwrite: true }
 		);
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -395,7 +396,7 @@ describe('Testing the entire transformation process', () => {
 			});`,
 			{ overwrite: true }
 		);
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).not.toContain(
@@ -421,7 +422,7 @@ describe('Testing the entire transformation process', () => {
 			`,
 			{ overwrite: true }
 		);
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -444,7 +445,7 @@ describe('Testing the entire transformation process', () => {
 			`,
 			{ overwrite: true }
 		);
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).not.toContain('z.enum(');
@@ -467,7 +468,7 @@ describe('Testing the entire transformation process', () => {
 			`,
 			{ overwrite: true }
 		);
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(
@@ -490,7 +491,7 @@ describe('Testing the entire transformation process', () => {
 			`,
 			{ overwrite: true }
 		);
-		handleFile(project)(f);
+		handleFile(project, defaultOptions)(f);
 		project.emitToMemory({ targetSourceFile: f });
 		const text = f.getText();
 		expect(text).toContain(

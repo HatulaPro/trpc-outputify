@@ -1,19 +1,21 @@
+import { type Options } from './cli';
 import { Project, type SourceFile } from 'ts-morph';
 import { handleProcedure } from './procedure';
 import { Travelers } from './travelers';
 
-export function createProject() {
+export function createProject(tsConfigFilePath: string) {
 	const project = new Project({
-		tsConfigFilePath: './tsconfig.json',
+		tsConfigFilePath: tsConfigFilePath,
 	});
-	project.addSourceFilesFromTsConfig('./tsconfig.json');
+	project.addSourceFilesFromTsConfig(tsConfigFilePath);
+
 	return project;
 }
 
-export function handleFile(p: Project) {
+export function handleFile(p: Project, options: Options) {
 	return (sourceFile: SourceFile) => {
 		sourceFile.forEachDescendant((node) => {
-			handleProcedure(p, node, (procedure) => {
+			handleProcedure(p, options, node, (procedure) => {
 				const rpcSecion =
 					procedure.propAccessExprsMap.get('query') ||
 					procedure.propAccessExprsMap.get('mutation');
