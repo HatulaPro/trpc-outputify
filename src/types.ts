@@ -81,6 +81,33 @@ export function isMapType(t: Type<ts.Type>) {
 	return false;
 }
 
+export function areAllSameEnumMembers(types: Type<ts.Type>[]) {
+	if (types.length === 0) return false;
+
+	let parentEnum: Map<string, unknown> | undefined;
+	let parentIdentifier: string | undefined;
+	types.every((t) => {
+		if (!t.isEnumLiteral()) return undefined;
+		// eslint-disable-next-line
+		// @ts-ignore
+		// eslint-disable-next-line
+		const parent = t.getSymbol()?.compilerSymbol.parent.exports;
+		if (parentEnum) {
+			return parent === parentEnum;
+		}
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+		parentEnum = parent;
+		// eslint-disable-next-line
+		parentIdentifier = t
+			.getSymbol()
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			?.compilerSymbol.parent.getEscapedName();
+		return true;
+	});
+	return parentEnum?.size === types.length ? parentIdentifier : undefined;
+}
+
 export function isFunction(t: Type<ts.Type>) {
 	return t.getCallSignatures().length > 0;
 }

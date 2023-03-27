@@ -3,6 +3,7 @@ import { ElementFlags } from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { createProject } from './file';
 import {
+	areAllSameEnumMembers,
 	getTupleElementsAndFlags,
 	getValueOfBooleanLiteral,
 	isDateType,
@@ -173,5 +174,51 @@ describe('should detect tuple values correctly', () => {
 		expect(elsAndFlags[0]?.element?.getText()).toBe('number');
 		expect(elsAndFlags[1]?.element?.getText()).toBe('string');
 		expect(elsAndFlags[1]?.flag).toBe(ElementFlags.Rest);
+	});
+});
+
+describe('should detect enum values correctly', () => {
+	const project = createProject();
+
+	it('should detect an all-enum situation', () => {
+		const f = project.createSourceFile(
+			'newfile.ts',
+			`enum Color {
+				Blue,
+				Red,
+				Green,
+			}
+			const x: Color = Math.random() < 0.5 ? Color.Blue : Math.random() < 0.5 ? Color.Red : Color.Green;
+			`,
+			{ overwrite: true }
+		);
+
+		const enumVar = f.getFirstDescendantByKindOrThrow(
+			SyntaxKind.VariableDeclaration
+		);
+		const enumLiterals = enumVar.getType().getUnionTypes();
+		const areSame = areAllSameEnumMembers(enumLiterals);
+		expect(areSame).toBe('Color');
+	});
+
+	it('should not detect an all-enum situation because the types are used as literals', () => {
+		const f = project.createSourceFile(
+			'newfile.ts',
+			`enum Color {
+				Blue,
+				Red,
+				Green,
+			}
+			const x = Math.random() < 0.5 ? Color.Blue : Color.Green;
+			`,
+			{ overwrite: true }
+		);
+
+		const enumVar = f.getFirstDescendantByKindOrThrow(
+			SyntaxKind.VariableDeclaration
+		);
+		const enumLiterals = enumVar.getType().getUnionTypes();
+		const areSame = areAllSameEnumMembers(enumLiterals);
+		expect(areSame).toBe(undefined);
 	});
 });

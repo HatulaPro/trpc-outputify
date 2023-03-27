@@ -1,6 +1,7 @@
 import { ts, type Type, SyntaxKind, TypeFlags, type Node } from 'ts-morph';
 import { ElementFlags } from 'typescript';
 import {
+	areAllSameEnumMembers,
 	getTupleElementsAndFlags,
 	getValueOfBooleanLiteral,
 	isBigIntLiteral,
@@ -130,6 +131,7 @@ function writeUnionType({ node, f, t, depth }: ZodWriter) {
 	const isStringLiteralsUnion = filteredUnionTypes.every((x) =>
 		x.isStringLiteral()
 	);
+	const isNativeEnum = areAllSameEnumMembers(filteredUnionTypes);
 
 	if (filteredUnionTypes.length === 0) {
 		return wrapWithModifier(
@@ -139,41 +141,42 @@ function writeUnionType({ node, f, t, depth }: ZodWriter) {
 		);
 	}
 
-	const currentZodType =
-		filteredUnionTypes.length === 1
-			? writeZodTypeRecursive({
-					node,
-					f,
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-					t: filteredUnionTypes[0]!,
-					depth,
-			  })
-			: f.createCallExpression(
-					f.createPropertyAccessExpression(
-						f.createIdentifier('z'),
-						f.createIdentifier(
-							isStringLiteralsUnion ? 'enum' : 'union'
-						)
-					),
-					undefined,
-					[
-						f.createArrayLiteralExpression(
-							filteredUnionTypes.map((unionType) =>
-								isStringLiteralsUnion
-									? f.createStringLiteral(
-											unionType.getLiteralValue() as string
-									  )
-									: writeZodTypeRecursive({
-											node,
-											f,
-											t: unionType,
-											depth,
-									  })
-							),
-							false
+	const currentZodType = isNativeEnum
+		? writeSimpleZodValidator(f, 'nativeEnum', [
+				f.createIdentifier(isNativeEnum),
+		  ])
+		: filteredUnionTypes.length === 1
+		? writeZodTypeRecursive({
+				node,
+				f,
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				t: filteredUnionTypes[0]!,
+				depth,
+		  })
+		: f.createCallExpression(
+				f.createPropertyAccessExpression(
+					f.createIdentifier('z'),
+					f.createIdentifier(isStringLiteralsUnion ? 'enum' : 'union')
+				),
+				undefined,
+				[
+					f.createArrayLiteralExpression(
+						filteredUnionTypes.map((unionType) =>
+							isStringLiteralsUnion
+								? f.createStringLiteral(
+										unionType.getLiteralValue() as string
+								  )
+								: writeZodTypeRecursive({
+										node,
+										f,
+										t: unionType,
+										depth,
+								  })
 						),
-					]
-			  );
+						false
+					),
+				]
+		  );
 
 	if (hasNull && hasUndefined) {
 		return wrapWithModifier(currentZodType, f, 'nullish');
