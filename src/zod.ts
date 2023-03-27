@@ -8,6 +8,7 @@ import {
 	isDateType,
 	isFunction,
 	isMapType,
+	isRecordType,
 	isSetType,
 	removePromiseFromType,
 	simplifyIntersectionType,
@@ -92,6 +93,8 @@ function writeZodTypeRecursive({
 		return writeSetType({ node, f, t, depth });
 	} else if (isMapType(t)) {
 		return writeMapType({ node, f, t, depth });
+	} else if (isRecordType(t)) {
+		return writeRecordType({ node, f, t, depth });
 	} else if (t.isObject()) {
 		return writeObjectType({ node, f, t, depth });
 	} else if (t.isIntersection()) {
@@ -269,6 +272,22 @@ function writeMapType({ node, f, t, depth }: ZodWriter) {
 		]);
 	} else {
 		return writeSimpleZodValidator(f, 'map', [
+			writeSimpleZodValidator(f, 'any'),
+			writeSimpleZodValidator(f, 'any'),
+		]);
+	}
+}
+
+function writeRecordType({ node, f, t, depth }: ZodWriter) {
+	depth++;
+	const [elKeyType, elValueType] = t.getAliasTypeArguments();
+	if (elKeyType && elValueType) {
+		return writeSimpleZodValidator(f, 'record', [
+			writeZodTypeRecursive({ node, f, t: elKeyType, depth }),
+			writeZodTypeRecursive({ node, f, t: elValueType, depth }),
+		]);
+	} else {
+		return writeSimpleZodValidator(f, 'record', [
 			writeSimpleZodValidator(f, 'any'),
 			writeSimpleZodValidator(f, 'any'),
 		]);

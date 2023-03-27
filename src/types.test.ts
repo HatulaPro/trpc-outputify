@@ -8,6 +8,7 @@ import {
 	getValueOfBooleanLiteral,
 	isDateType,
 	isMapType,
+	isRecordType,
 	isSetType,
 	removePromiseFromType,
 } from './types';
@@ -83,15 +84,16 @@ describe('getValueOfBooleanLiteral should work', () => {
 	});
 });
 
-describe('should detect values correctly should work', () => {
+describe('should detect values correctly', () => {
 	const project = createProject();
-	it('should return true', () => {
+	it('should return the right types', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
 			`
 			const x = new Date();
 			const y = new Set([1, 2]);
 			const z = new Map([[1, 'bluh']]);
+			const w: Record<string, number> = {'a': 1, 'b': 2};
 			`,
 			{ overwrite: true }
 		);
@@ -103,18 +105,28 @@ describe('should detect values correctly should work', () => {
 		const shouldBeSet = types[1]!.getType();
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const shouldBeMap = types[2]!.getType();
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const shouldBeRecord = types[3]!.getType();
 
 		expect(isDateType(shouldBeDate)).toBe(true);
 		expect(isDateType(shouldBeSet)).toBe(false);
 		expect(isDateType(shouldBeMap)).toBe(false);
+		expect(isDateType(shouldBeRecord)).toBe(false);
 
 		expect(isSetType(shouldBeDate)).toBe(false);
 		expect(isSetType(shouldBeSet)).toBe(true);
 		expect(isSetType(shouldBeMap)).toBe(false);
+		expect(isDateType(shouldBeRecord)).toBe(false);
 
 		expect(isMapType(shouldBeDate)).toBe(false);
 		expect(isMapType(shouldBeSet)).toBe(false);
 		expect(isMapType(shouldBeMap)).toBe(true);
+		expect(isDateType(shouldBeRecord)).toBe(false);
+
+		expect(isRecordType(shouldBeDate)).toBe(false);
+		expect(isRecordType(shouldBeSet)).toBe(false);
+		expect(isRecordType(shouldBeMap)).toBe(false);
+		expect(isRecordType(shouldBeRecord)).toBe(true);
 	});
 });
 

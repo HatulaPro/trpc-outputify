@@ -474,4 +474,27 @@ describe('Testing the entire transformation process', () => {
 			'.output(/* BEGIN GENERATED CONTENT */ z.union([z.literal(3), z.string()]) /* END GENERATED CONTENT */)'
 		);
 	});
+
+	it('Should parse the record correctly', () => {
+		const f = project.createSourceFile(
+			'1234.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+						
+			const t = initTRPC.context().create();
+			t.router({
+				myProc: t.procedure.query(() => {
+					return {1: 'hello', 2: 'wow', 3: 'nice', '?': 'lol'} as Record<number | '?', string>;
+				}),
+			});
+			`,
+			{ overwrite: true }
+		);
+		handleFile(project)(f);
+		project.emitToMemory({ targetSourceFile: f });
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.record(z.union([z.number(), z.literal("?")]), z.string()) /* END GENERATED CONTENT */)'
+		);
+	});
 });

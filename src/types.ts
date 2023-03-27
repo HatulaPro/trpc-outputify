@@ -81,6 +81,17 @@ export function isMapType(t: Type<ts.Type>) {
 	return false;
 }
 
+export function isRecordType(t: Type<ts.Type>) {
+	if (
+		t.isObject() &&
+		t.getSymbol()?.getEscapedName() === '__type' &&
+		t.getAliasSymbol()?.getName() === 'Record'
+	) {
+		return true;
+	}
+	return false;
+}
+
 export function areAllSameEnumMembers(types: Type<ts.Type>[]) {
 	if (types.length === 0) return false;
 
