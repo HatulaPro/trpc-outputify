@@ -1,6 +1,7 @@
-import { Project, ScriptTarget, SyntaxKind } from 'ts-morph';
+import { SyntaxKind } from 'ts-morph';
 import { ElementFlags } from 'typescript';
 import { describe, expect, it } from 'vitest';
+import { createProject } from './file';
 import {
 	getTupleElementsAndFlags,
 	getValueOfBooleanLiteral,
@@ -11,13 +12,7 @@ import {
 } from './types';
 
 describe('removePromiseFromType should turn Promise<T> into T', () => {
-	const project = new Project({
-		compilerOptions: {
-			tsConfigFilePath: './tsconfig.json',
-			strict: true,
-			target: ScriptTarget.ES2020,
-		},
-	});
+	const project = createProject();
 	it('should get the type inside the promise', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -68,13 +63,7 @@ describe('removePromiseFromType should turn Promise<T> into T', () => {
 });
 
 describe('getValueOfBooleanLiteral should work', () => {
-	const project = new Project({
-		compilerOptions: {
-			tsConfigFilePath: './tsconfig.json',
-			strict: true,
-			target: ScriptTarget.ES2020,
-		},
-	});
+	const project = createProject();
 	it('should return true', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -94,13 +83,7 @@ describe('getValueOfBooleanLiteral should work', () => {
 });
 
 describe('should detect values correctly should work', () => {
-	const project = new Project({
-		compilerOptions: {
-			tsConfigFilePath: './tsconfig.json',
-			strict: true,
-			target: ScriptTarget.ES2020,
-		},
-	});
+	const project = createProject();
 	it('should return true', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -135,13 +118,7 @@ describe('should detect values correctly should work', () => {
 });
 
 describe('should detect tuple values correctly', () => {
-	const project = new Project({
-		compilerOptions: {
-			tsConfigFilePath: './tsconfig.json',
-			strict: true,
-			target: ScriptTarget.ES2020,
-		},
-	});
+	const project = createProject();
 
 	it('should detect a standard tuple', () => {
 		const f = project.createSourceFile(

@@ -1,13 +1,6 @@
-import { Project } from 'ts-morph';
-import { handleFile } from './file';
+import { createProject, handleFile } from './file';
 
-const project = new Project({
-	compilerOptions: {
-		tsConfigFilePath: './tsconfig.json',
-		strict: true,
-	},
-});
-project.addSourceFilesFromTsConfig('./tsconfig.json');
+const project = createProject();
 // const sourceFiles = project.getSourceFiles(["./src/server/api/routers/**.ts"]);
 const sourceFiles = project.getSourceFiles(['./src/playground.ts']);
 

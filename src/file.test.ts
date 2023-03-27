@@ -1,14 +1,8 @@
-import { Project } from 'ts-morph';
 import { describe, expect, it } from 'vitest';
-import { handleFile } from './file';
+import { createProject, handleFile } from './file';
 
 describe('Testing the entire transformation process', () => {
-	const project = new Project({
-		compilerOptions: {
-			tsConfigFilePath: './tsconfig.json',
-			strict: true,
-		},
-	});
+	const project = createProject();
 	it('Should add an output right after the input', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',

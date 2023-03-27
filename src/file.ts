@@ -1,6 +1,14 @@
-import { type Project, type SourceFile } from 'ts-morph';
+import { Project, type SourceFile } from 'ts-morph';
 import { handleProcedure } from './procedure';
 import { Travelers } from './travelers';
+
+export function createProject() {
+	const project = new Project({
+		tsConfigFilePath: './tsconfig.json',
+	});
+	project.addSourceFilesFromTsConfig('./tsconfig.json');
+	return project;
+}
 
 export function handleFile(p: Project) {
 	return (sourceFile: SourceFile) => {
