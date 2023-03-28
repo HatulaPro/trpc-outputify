@@ -1,5 +1,15 @@
 import { TypeFlags, type ts, type Type } from 'ts-morph';
-import type { ElementFlags } from 'typescript';
+
+export enum ElementFlags {
+	Required = 1,
+	Optional = 2,
+	Rest = 4,
+	Variadic = 8,
+	Fixed = 3,
+	Variable = 12,
+	NonRequired = 14,
+	NonRest = 11,
+}
 
 export function removePromiseFromType(t: Type<ts.Type>) {
 	if (

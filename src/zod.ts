@@ -1,5 +1,5 @@
 import { ts, type Type, SyntaxKind, TypeFlags, type Node } from 'ts-morph';
-import { ElementFlags } from 'typescript';
+import { ElementFlags } from './types';
 import {
 	areAllSameEnumMembers,
 	getTupleElementsAndFlags,

@@ -1,8 +1,8 @@
 import { SyntaxKind } from 'ts-morph';
-import { ElementFlags } from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { createProject } from './file';
 import {
+	ElementFlags,
 	areAllSameEnumMembers,
 	getTupleElementsAndFlags,
 	getValueOfBooleanLiteral,

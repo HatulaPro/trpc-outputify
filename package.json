@@ -2,10 +2,10 @@
 	"name": "trpc-outputify",
 	"version": "0.0.1",
 	"description": "A codemod that automatically adds an output validator to trpc procedures.",
-	"main": "./dist/index.js",
+	"main": "./dist/index.mjs",
 	"module": "./dist/index.mjs",
 	"scripts": {
-		"build": "tsup src/index.ts --format cjs,esm",
+		"build": "tsup src/index.ts --format esm",
 		"lint": "tsc && eslint",
 		"dev": "vitest",
 		"test": "vitest run"
@@ -14,6 +14,7 @@
 	"author": "Shalev Raz Israel",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/inquirer": "^9.0.3",
 		"@types/node": "^18.15.10",
 		"@typescript-eslint/eslint-plugin": "^5.56.0",
 		"@typescript-eslint/parser": "^5.56.0",
@@ -25,6 +26,7 @@
 	"dependencies": {
 		"@trpc/server": "^10.18.0",
 		"commander": "^10.0.0",
+		"inquirer": "^9.1.5",
 		"ts-morph": "^17.0.1",
 		"zod": "^3.21.4"
 	}
