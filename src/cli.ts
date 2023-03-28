@@ -1,15 +1,22 @@
+import inquirer from 'inquirer';
 import { Command } from 'commander';
 
 export type Options = {
 	procedures: string[];
 	tsConfigFilePath: string;
 	files: string;
+	filesChanged: number;
+	proceduresChanged: number;
 };
 export const defaultOptions = {
 	procedures: ['publicProcedure', 'protectedProcedure', 'procedure'],
 	tsConfigFilePath: './tsconfig.json',
 	files: './src/**.ts',
+	filesChanged: 0,
+	proceduresChanged: 0,
 } satisfies Options;
+
+export const bottomBar = new inquirer.ui.BottomBar();
 
 export function parseArgs() {
 	const program = new Command()

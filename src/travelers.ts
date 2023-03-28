@@ -3,7 +3,7 @@ import { type ProcedureNode } from './procedure';
 import { writeZodType } from './zod';
 
 export const Travelers = {
-	addOutputAfterInput(procedure: ProcedureNode) {
+	addOutputAfterInput(procedure: ProcedureNode, onUpdate: () => void) {
 		return (traversal: TransformTraversalControl) => {
 			const node = traversal.visitChildren();
 			const f = traversal.factory;
@@ -11,6 +11,7 @@ export const Travelers = {
 				for (const child of node.getChildren()) {
 					if (ts.isPropertyAccessExpression(child)) {
 						if (child.name.escapedText === 'input') {
+							onUpdate();
 							return f.createCallExpression(
 								f.createPropertyAccessExpression(
 									node,
@@ -31,7 +32,7 @@ export const Travelers = {
 		};
 	},
 
-	updateExistingOutput(procedure: ProcedureNode) {
+	updateExistingOutput(procedure: ProcedureNode, onUpdate: () => void) {
 		return (traversal: TransformTraversalControl) => {
 			const node = traversal.visitChildren();
 			const f = traversal.factory;
@@ -39,6 +40,7 @@ export const Travelers = {
 				for (const child of node.getChildren()) {
 					if (ts.isPropertyAccessExpression(child)) {
 						if (child.name.escapedText === 'output') {
+							onUpdate();
 							return f.updateCallExpression(
 								node,
 								child,
@@ -57,35 +59,10 @@ export const Travelers = {
 		};
 	},
 
-	addOutputBeforeRPC(procedure: ProcedureNode) {
+	addOutputBeforeRPC(procedure: ProcedureNode, onUpdate: () => void) {
 		return (traversal: TransformTraversalControl) => {
 			const node = traversal.visitChildren();
 			const f = traversal.factory;
-			// if (ts.isCallExpression(node)) {
-			// 	const parent = node.parent;
-			// 	if (ts.isPropertyAccessExpression(parent)) {
-			// 		if (
-			// 			parent.name.escapedText === 'query' ||
-			// 			parent.name.escapedText === 'mutation'
-			// 		) {
-			// 			return f.createPropertyAccessExpression(
-			// 				f.createCallExpression(
-			// 					f.createPropertyAccessExpression(
-			// 						node,
-			// 						'output'
-			// 					),
-			// 					[],
-			// 					writeZodType(
-			// 						procedure.node,
-			// 						f,
-			// 						procedure.returnType
-			// 					)
-			// 				),
-			// 				parent.name.escapedText
-			// 			);
-			// 		}
-			// 	}
-			// }
 			if (ts.isPropertyAccessExpression(node)) {
 				if (
 					node.name.escapedText === 'query' ||
@@ -96,6 +73,7 @@ export const Travelers = {
 							ts.isCallExpression(child) ||
 							ts.isPropertyAccessExpression(child)
 						) {
+							onUpdate();
 							return f.createPropertyAccessExpression(
 								f.createCallExpression(
 									f.createPropertyAccessExpression(
