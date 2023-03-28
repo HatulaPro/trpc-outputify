@@ -3,22 +3,27 @@ import { bottomBar, parseArgs } from './cli';
 import { createProject, handleFile } from './file';
 
 function main() {
-	const defaultOptions = parseArgs();
+	const options = parseArgs();
 
-	const project = createProject(defaultOptions.tsConfigFilePath);
+	const project = createProject(options.tsConfigFilePath);
 
-	// const sourceFiles = project.getSourceFiles(['./src/playground.ts']);
-	const sourceFiles = project.getSourceFiles(defaultOptions.files);
-	bottomBar.log.write(
-		`Scanning ${sourceFiles.length} files at ${defaultOptions.files}`
-	);
-	sourceFiles.forEach(handleFile(project, defaultOptions));
+	const sourceFiles = project.getSourceFiles(options.files);
+
+	if (!options.silent) {
+		bottomBar.log.write(
+			`Scanning ${sourceFiles.length} files at ${options.files}`
+		);
+	}
+
+	sourceFiles.forEach(handleFile(project, options));
 
 	project.saveSync();
 
-	bottomBar.updateBottomBar(
-		`Modified ${defaultOptions.filesChanged} files (${defaultOptions.proceduresChanged} procedures)`
-	);
+	if (!options.silent) {
+		bottomBar.updateBottomBar(
+			`Modified ${options.filesChanged} files (${options.proceduresChanged} procedures)`
+		);
+	}
 	exit(0);
 }
 

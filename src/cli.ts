@@ -7,14 +7,16 @@ export type Options = {
 	files: string;
 	filesChanged: number;
 	proceduresChanged: number;
+	silent: boolean;
 };
-export const defaultOptions = {
+export const defaultOptions: Options = {
 	procedures: ['publicProcedure', 'protectedProcedure', 'procedure'],
 	tsConfigFilePath: './tsconfig.json',
 	files: './src/**.ts',
 	filesChanged: 0,
 	proceduresChanged: 0,
-} satisfies Options;
+	silent: false,
+};
 
 export const bottomBar = new inquirer.ui.BottomBar();
 
@@ -37,7 +39,8 @@ export function parseArgs() {
 			'-p, --procedures <procedures...>',
 			'The names of the procedures',
 			defaultOptions.procedures
-		);
+		)
+		.option('-s, --silent', 'silent mode, no output will be shown');
 	program.parse();
 
 	const options = program.opts();
@@ -45,6 +48,7 @@ export function parseArgs() {
 		(program.args[0] as string | undefined) ?? defaultOptions.files;
 	defaultOptions.tsConfigFilePath = options.config as string;
 	defaultOptions.procedures = options.procedures as string[];
+	defaultOptions.silent = options.silent as boolean;
 
 	return defaultOptions;
 }

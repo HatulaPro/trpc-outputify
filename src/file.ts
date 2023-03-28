@@ -16,10 +16,13 @@ export function createProject(tsConfigFilePath: string) {
 	}
 }
 
-let count = 0;
 export function handleFile(p: Project, options: Options) {
 	return (sourceFile: SourceFile) => {
-		bottomBar.updateBottomBar('Parsing file: ' + sourceFile.getBaseName());
+		if (!options.silent) {
+			bottomBar.updateBottomBar(
+				'Parsing file: ' + sourceFile.getBaseName()
+			);
+		}
 		const numOfProceduresChanged = options.proceduresChanged;
 		const updateProceduresChangedCount = () => {
 			options.proceduresChanged++;
@@ -69,11 +72,13 @@ export function handleFile(p: Project, options: Options) {
 		// If file changed, format it
 		if (!sourceFile.isSaved()) {
 			options.filesChanged++;
-			bottomBar.log.write(
-				`Modified ${sourceFile.getBaseName()} (${
-					options.proceduresChanged - numOfProceduresChanged
-				} procedures)`
-			);
+			if (!options.silent) {
+				bottomBar.log.write(
+					`Modified ${sourceFile.getBaseName()} (${
+						options.proceduresChanged - numOfProceduresChanged
+					} procedures)`
+				);
+			}
 			addZodImportIfNotExists(sourceFile);
 			sourceFile.formatText();
 		}
