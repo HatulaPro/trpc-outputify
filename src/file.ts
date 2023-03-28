@@ -1,5 +1,5 @@
 import { bottomBar, type Options } from './cli';
-import { Project, type SourceFile } from 'ts-morph';
+import { Project, type SourceFile, SyntaxKind, ts } from 'ts-morph';
 import { handleProcedure } from './procedure';
 import { Travelers } from './travelers';
 
@@ -35,10 +35,10 @@ export function handleFile(p: Project, options: Options) {
 				if (!rpcSecion) return;
 				const inputSection = procedure.propAccessExprsMap
 					.get('input')
-					?.getParent();
+					?.getParentIfKind(SyntaxKind.CallExpression);
 				const outputSection = procedure.propAccessExprsMap
 					.get('output')
-					?.getParent();
+					?.getParentIfKind(SyntaxKind.CallExpression);
 
 				// If no .output, create the output and put it right after the input
 				if (!outputSection && inputSection) {
@@ -49,6 +49,20 @@ export function handleFile(p: Project, options: Options) {
 						)
 					);
 				} else if (outputSection) {
+					if (
+						!options.silent &&
+						!outputSection
+							.getFullText()
+							.includes('/* BEGIN GENERATED CONTENT */') &&
+						!outputSection
+							.getFullText()
+							.includes('/* END GENERATED CONTENT */')
+					) {
+						bottomBar.log.write(
+							`Warning: rewriting existing output for procedure \`${procedure.name}\``
+						);
+					}
+
 					// If there is an output already, update it
 					outputSection.transform(
 						Travelers.updateExistingOutput(
@@ -76,7 +90,7 @@ export function handleFile(p: Project, options: Options) {
 				bottomBar.log.write(
 					`Modified ${sourceFile.getBaseName()} (${
 						options.proceduresChanged - numOfProceduresChanged
-					} procedures)`
+					} procedures updated)`
 				);
 			}
 			addZodImportIfNotExists(sourceFile);

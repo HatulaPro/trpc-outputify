@@ -18,6 +18,7 @@ export type ProcedureNode = {
 		PropertyAccessExpression<ts.PropertyAccessExpression>
 	>;
 	returnType: Type<ts.Type>;
+	name: string;
 };
 
 function shouldIgnoreProcedure(f: Node<ts.Node> | undefined) {
@@ -88,6 +89,10 @@ export function handleProcedure(
 				propAccessExprs,
 				returnType,
 				propAccessExprsMap,
+				name:
+					callExpers[callExpers.length - 1]
+						?.getParentIfKind(SyntaxKind.PropertyAssignment)
+						?.getName() ?? 'unknown procedure',
 			});
 			return;
 		}
@@ -142,6 +147,10 @@ export function handleProcedure(
 			propAccessExprs,
 			returnType,
 			propAccessExprsMap,
+			name:
+				callExpers[callExpers.length - 1]
+					?.getParentIfKind(SyntaxKind.PropertyAssignment)
+					?.getName() ?? 'unknown procedure',
 		});
 	}
 }

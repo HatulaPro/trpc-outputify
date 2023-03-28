@@ -15,7 +15,7 @@ export const defaultOptions: Options = {
 	files: './src/**.ts',
 	filesChanged: 0,
 	proceduresChanged: 0,
-	silent: false,
+	silent: true,
 };
 
 export const bottomBar = new inquirer.ui.BottomBar();
@@ -40,7 +40,7 @@ export function parseArgs() {
 			'The names of the procedures',
 			defaultOptions.procedures
 		)
-		.option('-s, --silent', 'silent mode, no output will be shown');
+		.option('-s, --silent', 'silent mode, no output will be shown', false);
 	program.parse();
 
 	const options = program.opts();

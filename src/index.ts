@@ -21,7 +21,7 @@ function main() {
 
 	if (!options.silent) {
 		bottomBar.updateBottomBar(
-			`Modified ${options.filesChanged} files (${options.proceduresChanged} procedures)`
+			`Modified ${options.filesChanged} files (${options.proceduresChanged} procedures updated)`
 		);
 	}
 	exit(0);
