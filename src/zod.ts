@@ -302,12 +302,14 @@ function writeObjectType({ node, f, t, depth }: ZodWriter) {
 
 	return writeSimpleZodValidator(f, 'object', [
 		f.createObjectLiteralExpression(
-			propertiesAndTypes.map(([propName, type]) =>
-				f.createPropertyAssignment(
-					f.createIdentifier(propName),
-					writeZodTypeRecursive({ node, f, t: type, depth })
+			propertiesAndTypes
+				.filter((propAndtype) => !isFunction(propAndtype[1]))
+				.map(([propName, type]) =>
+					f.createPropertyAssignment(
+						f.createIdentifier(propName),
+						writeZodTypeRecursive({ node, f, t: type, depth })
+					)
 				)
-			)
 		),
 	]);
 }
