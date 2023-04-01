@@ -1,4 +1,5 @@
-import { TypeFlags, type ts, type Type } from 'ts-morph';
+import { Node, TypeFlags, type ts, Type } from 'ts-morph';
+import type { Type as TSType } from 'typescript';
 
 export enum ElementFlags {
 	Required = 1,
@@ -11,12 +12,22 @@ export enum ElementFlags {
 	NonRest = 11,
 }
 
-export function removePromiseFromType(t: Type<ts.Type>) {
-	if (t.getProperty('then') && t.getProperty('catch')) {
-		return t.getTypeArguments()[0] ?? t;
+export function removePromiseFromType(t: Type<ts.Type>, node: Node<ts.Node>) {
+	// Using native TS compiler function for more accuracy
+	try {
+		const res =
+			// @ts-ignore
+			new Type(
+				// @ts-ignore
+				node.getProject()._context,
+				(
+					node.getProject().getTypeChecker().compilerObject as any
+				).getPromisedTypeOfPromise(t.compilerType) as TSType
+			) as Type<ts.Type> | undefined;
+		return res?.compilerType ? res : t;
+	} catch {
+		return t;
 	}
-
-	return t;
 }
 
 export function getTupleElementsAndFlags(t: Type<ts.Type>) {

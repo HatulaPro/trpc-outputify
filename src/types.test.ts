@@ -26,7 +26,7 @@ describe('removePromiseFromType should turn Promise<T> into T', () => {
 		const types = f.getDescendantsOfKind(SyntaxKind.TypeAliasDeclaration);
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const type = types[0]!.getType();
-		const resultType = removePromiseFromType(type);
+		const resultType = removePromiseFromType(type, types[0]!);
 
 		expect(resultType?.getText()).toBe('number');
 	});
@@ -41,7 +41,7 @@ describe('removePromiseFromType should turn Promise<T> into T', () => {
 		const types = f.getDescendantsOfKind(SyntaxKind.TypeAliasDeclaration);
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const type = types[0]!.getType();
-		const resultType = removePromiseFromType(type);
+		const resultType = removePromiseFromType(type, types[0]!);
 		expect(resultType?.getText()).toBe('string | number');
 	});
 
@@ -56,7 +56,7 @@ describe('removePromiseFromType should turn Promise<T> into T', () => {
 		const types = f.getDescendantsOfKind(SyntaxKind.TypeAliasDeclaration);
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const type = types[0]!.getType();
-		const resultType = removePromiseFromType(type);
+		const resultType = removePromiseFromType(type, types[0]!);
 		expect(resultType.isUnion()).toBe(true);
 		const unionTypes = resultType.getUnionTypes().map((x) => x.getText());
 		expect(unionTypes).toContain('string');

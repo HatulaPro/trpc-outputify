@@ -1,4 +1,4 @@
-import { ts, type Type, SyntaxKind, TypeFlags, type Node } from 'ts-morph';
+import { ts, Type, SyntaxKind, TypeFlags, type Node } from 'ts-morph';
 import { ElementFlags } from './types';
 import {
 	areAllSameEnumMembers,
@@ -27,7 +27,7 @@ export function writeZodType(
 	f: ts.NodeFactory,
 	t: Type<ts.Type>
 ) {
-	const promised = removePromiseFromType(t);
+	const promised = removePromiseFromType(t, node);
 	return [
 		wrapWithComments(
 			writeZodTypeRecursive({ node, f, t: promised, depth: 0 })
