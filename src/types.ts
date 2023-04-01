@@ -165,3 +165,7 @@ export function simplifyIntersectionType(t: Type<ts.Type>) {
 export function isFunction(t: Type<ts.Type>) {
 	return t.getCallSignatures().length > 0;
 }
+
+export function isVoid(t: Type<ts.Type>) {
+	return t.getFlags() === TypeFlags.Void;
+}

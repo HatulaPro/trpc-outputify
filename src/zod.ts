@@ -1,5 +1,5 @@
 import { ts, Type, SyntaxKind, TypeFlags, type Node } from 'ts-morph';
-import { ElementFlags } from './types';
+import { ElementFlags, isVoid } from './types';
 import {
 	areAllSameEnumMembers,
 	getTupleElementsAndFlags,
@@ -104,6 +104,8 @@ function writeZodTypeRecursive({
 			t: simplifyIntersectionType(t),
 			depth,
 		});
+	} else if (isVoid(t)) {
+		return writeSimpleZodValidator(f, 'void');
 	}
 	return f.createStringLiteral(t.getText());
 }
