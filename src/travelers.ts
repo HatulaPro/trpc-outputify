@@ -71,7 +71,8 @@ export const Travelers = {
 					for (const child of node.getChildren()) {
 						if (
 							ts.isCallExpression(child) ||
-							ts.isPropertyAccessExpression(child)
+							ts.isPropertyAccessExpression(child) ||
+							ts.isIdentifier(child)
 						) {
 							onUpdate();
 							return f.createPropertyAccessExpression(

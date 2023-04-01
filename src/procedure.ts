@@ -71,6 +71,7 @@ export function handleProcedure(
 		const parent = node.getParentIfKind(
 			SyntaxKind.PropertyAccessExpression
 		);
+
 		if (child.getName() === 'query' || child.getName() === 'mutation') {
 			const propAccessExprs = [child];
 			const callExpers = [node];

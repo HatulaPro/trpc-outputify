@@ -12,11 +12,7 @@ export enum ElementFlags {
 }
 
 export function removePromiseFromType(t: Type<ts.Type>) {
-	if (
-		t.getProperty('then') &&
-		t.getProperty('catch') &&
-		t.getSymbol()?.getEscapedName() === 'Promise'
-	) {
+	if (t.getProperty('then') && t.getProperty('catch')) {
 		return t.getTypeArguments()[0] ?? t;
 	}
 

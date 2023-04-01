@@ -118,6 +118,33 @@ describe('Testing the entire transformation process', () => {
 		);
 	});
 
+	it('Should update the output', () => {
+		const f = project.createSourceFile(
+			'newfile.ts',
+			`import { initTRPC } from '@trpc/server';
+			import { z } from 'zod';
+			
+			const t = initTRPC.context().create();
+			const publicProcedure = t.procedure;
+			t.router({
+				myProc: publicProcedure
+					.output(z.object({z: z.string()}))
+					.query(() => {
+						return { z: 'asd' };
+					}),
+			});
+			`,
+			{ overwrite: true }
+		);
+
+		handleFile(project, defaultOptions)(f);
+		project.emitToMemory({ targetSourceFile: f });
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.object({ z: z.string() }) /* END GENERATED CONTENT */)'
+		);
+	});
+
 	it('Should set the output type to be `z.string()`.', () => {
 		const f = project.createSourceFile(
 			'newfile.ts',
@@ -281,7 +308,7 @@ describe('Testing the entire transformation process', () => {
 		);
 	});
 
-	it('Should throw an error, because function can not be serialized.', () => {
+	it('Should ignore the y property, because functions can not be serialized.', () => {
 		const f = project.createSourceFile(
 			'asdasd.ts',
 			`import { initTRPC } from '@trpc/server';
@@ -301,7 +328,12 @@ describe('Testing the entire transformation process', () => {
 			`,
 			{ overwrite: true }
 		);
-		expect(() => handleFile(project, defaultOptions)(f)).toThrowError();
+		handleFile(project, defaultOptions)(f);
+		project.emitToMemory({ targetSourceFile: f });
+		const text = f.getText();
+		expect(text).toContain(
+			'.output(/* BEGIN GENERATED CONTENT */ z.object({ x: z.number() }) /* END GENERATED CONTENT */)'
+		);
 	});
 
 	it('Should handle null, undefined and unions correctly.', () => {

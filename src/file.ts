@@ -39,7 +39,6 @@ export function handleFile(p: Project, options: Options) {
 				const outputSection = procedure.propAccessExprsMap
 					.get('output')
 					?.getParentIfKind(SyntaxKind.CallExpression);
-
 				// If no .output, create the output and put it right after the input
 				if (!outputSection && inputSection) {
 					inputSection.transform(

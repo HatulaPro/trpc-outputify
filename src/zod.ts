@@ -297,7 +297,7 @@ function writeRecordType({ node, f, t, depth }: ZodWriter) {
 function writeObjectType({ node, f, t, depth }: ZodWriter) {
 	depth++;
 	const propertiesAndTypes = t
-		.getProperties()
+		.getApparentProperties()
 		.map((x) => [x.getName(), x.getTypeAtLocation(node)] as const);
 
 	return writeSimpleZodValidator(f, 'object', [
