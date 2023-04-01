@@ -1,5 +1,5 @@
 import { bottomBar, type Options } from './cli';
-import { Project, type SourceFile, SyntaxKind, ts } from 'ts-morph';
+import { Project, type SourceFile, SyntaxKind } from 'ts-morph';
 import { handleProcedure } from './procedure';
 import { Travelers } from './travelers';
 
