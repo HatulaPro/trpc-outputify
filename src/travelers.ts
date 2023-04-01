@@ -3,7 +3,7 @@ import { type ProcedureNode } from './procedure';
 import { writeZodType } from './zod';
 
 export const Travelers = {
-	addOutputAfterInput(procedure: ProcedureNode, onUpdate: () => void) {
+	addOutputAfterInput(procedure: ProcedureNode) {
 		return (traversal: TransformTraversalControl) => {
 			const node = traversal.visitChildren();
 			const f = traversal.factory;
@@ -11,7 +11,6 @@ export const Travelers = {
 				for (const child of node.getChildren()) {
 					if (ts.isPropertyAccessExpression(child)) {
 						if (child.name.escapedText === 'input') {
-							onUpdate();
 							return f.createCallExpression(
 								f.createPropertyAccessExpression(
 									node,
@@ -59,7 +58,7 @@ export const Travelers = {
 		};
 	},
 
-	addOutputBeforeRPC(procedure: ProcedureNode, onUpdate: () => void) {
+	addOutputBeforeRPC(procedure: ProcedureNode) {
 		return (traversal: TransformTraversalControl) => {
 			const node = traversal.visitChildren();
 			const f = traversal.factory;
@@ -74,7 +73,6 @@ export const Travelers = {
 							ts.isPropertyAccessExpression(child) ||
 							ts.isIdentifier(child)
 						) {
-							onUpdate();
 							return f.createPropertyAccessExpression(
 								f.createCallExpression(
 									f.createPropertyAccessExpression(

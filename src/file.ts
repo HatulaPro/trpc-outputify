@@ -42,10 +42,7 @@ export function handleFile(p: Project, options: Options) {
 				// If no .output, create the output and put it right after the input
 				if (!outputSection && inputSection) {
 					inputSection.transform(
-						Travelers.addOutputAfterInput(
-							procedure,
-							updateProceduresChangedCount
-						)
+						Travelers.addOutputAfterInput(procedure)
 					);
 				} else if (outputSection) {
 					if (
@@ -73,12 +70,7 @@ export function handleFile(p: Project, options: Options) {
 					// If there is no output and no input section, create the output section
 					rpcSecion
 						.getParent()!
-						.transform(
-							Travelers.addOutputBeforeRPC(
-								procedure,
-								updateProceduresChangedCount
-							)
-						);
+						.transform(Travelers.addOutputBeforeRPC(procedure));
 				}
 			});
 		});
