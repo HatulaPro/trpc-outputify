@@ -169,3 +169,7 @@ export function isFunction(t: Type<ts.Type>) {
 export function isVoid(t: Type<ts.Type>) {
 	return t.getFlags() === TypeFlags.Void;
 }
+
+export function isSymbolProperty(name: string) {
+	return name.startsWith('__@');
+}

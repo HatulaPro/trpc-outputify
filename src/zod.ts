@@ -1,5 +1,5 @@
 import { ts, Type, SyntaxKind, TypeFlags, type Node } from 'ts-morph';
-import { ElementFlags, isVoid } from './types';
+import { ElementFlags, isSymbolProperty, isVoid } from './types';
 import {
 	areAllSameEnumMembers,
 	getTupleElementsAndFlags,
@@ -300,18 +300,22 @@ function writeObjectType({ node, f, t, depth }: ZodWriter) {
 	depth++;
 	const propertiesAndTypes = t
 		.getApparentProperties()
-		.map((x) => [x.getName(), x.getTypeAtLocation(node)] as const);
+		.map((x) => {
+			return [x.getName(), x.getTypeAtLocation(node)] as const;
+		})
+		.filter(
+			([propName, type]) =>
+				!isFunction(type) && !isSymbolProperty(propName)
+		);
 
 	return writeSimpleZodValidator(f, 'object', [
 		f.createObjectLiteralExpression(
-			propertiesAndTypes
-				.filter((propAndtype) => !isFunction(propAndtype[1]))
-				.map(([propName, type]) =>
-					f.createPropertyAssignment(
-						f.createIdentifier(propName),
-						writeZodTypeRecursive({ node, f, t: type, depth })
-					)
+			propertiesAndTypes.map(([propName, type]) =>
+				f.createPropertyAssignment(
+					f.createIdentifier(propName),
+					writeZodTypeRecursive({ node, f, t: type, depth })
 				)
+			)
 		),
 	]);
 }
