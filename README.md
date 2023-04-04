@@ -5,23 +5,29 @@
 
 `trpc-outputify` relies the [TypeScript](https://www.typescriptlang.org/) compiler to generate the types, which means it can only understand the types TypeScript can understand. Generating validators that check the contents of the type (e.g. testing the length of a string) is not currently possible.
 
-## Usage
+# Installing
+
+```
+npm install -g trpc-outputify
+```
+
+# Usage
 
 ```sh
 $ trpc-outputify [options] [files]
 ```
 
-### Arguments
+## Arguments
 
 - `files`: A glob pattern to find files that contain tRPC procedures.
 
-### Options
+## Options
 
 - `-c, --config <tsconfig>`: Path to the local tsconfig.json file. By default, trpc-outputify looks for a tsconfig.json file in the current directory.
 - `-p, --procedures <procedures...>`: The names of the procedures to validate. By default, only the following procedures will be validated: `publicProcedure, protectedProcedure, and procedure`.
 - `-s, --silent`: Silent mode, no output will be shown.
 
-### Examples
+## Examples
 
 - To validate the default procedures in all files that match the glob pattern `routers/*.ts`, run:
   ```sh
@@ -32,10 +38,10 @@ $ trpc-outputify [options] [files]
   $ trpc-outputify -p globalModProcedure publicProcedure
   ```
 
-## I don't like the output. What should I do?
+# I don't like the output. What should I do?
 We can do a lot, but we can't always produce the zod type you are expecting to see. So, what can you do about it?
 
-#### Improving detection
+### Improving detection
 Often times the TypeScript compiler "overcomplicates" the types, which makes it harder to generate the validator correctly. Small things that can be done to improve it are:
 
   - Using async functions: 
@@ -69,7 +75,7 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
     });
     ```
 
-- #### @outputify-ignore
+- ### @outputify-ignore
   You can add an `@outputify-ignore` before your `query`/`mutation` functions calls. This lets the parser to know that want the procedure to remain unchanged.
 
   ```typescript
@@ -82,7 +88,7 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
       myOtherProc: t.procedure.query(() => "HELLO"),
   });
   ```
-- #### Use custom procedures
+- ### Use custom procedures
   The default procedures are: `[procedure, publicProcedure, protectedProcedure]`. Only procedures that were created using those names will be modified (you can change the default via the CLI). You can use other procedure names to keep parts of the program untouched:
 
   ```typescript
@@ -99,7 +105,7 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
       }),
   });
   ```
-- #### Let us know
+- ### Let us know
   Feel free to create an issue or open a PR.
 
 
