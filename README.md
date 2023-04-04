@@ -14,7 +14,7 @@ npm install -g trpc-outputify
 # Usage
 
 ```sh
-$ trpc-outputify [options] [files]
+$ trpc-outputify [files] [options]
 ```
 
 ## Arguments
@@ -33,9 +33,9 @@ $ trpc-outputify [options] [files]
   ```sh
   $ trpc-outputify "routers/*.ts"
   ```
-- To only validate procedures named: `globalModProcedure` and `publicProcedure`, run:
+- To only validate procedures named: `globalModProcedure` and `publicProcedure` and match the glob pattern `routers/*.ts`, run:
   ```sh
-  $ trpc-outputify -p globalModProcedure publicProcedure
+  $ trpc-outputify "routers/*.ts" -p globalModProcedure publicProcedure
   ```
 
 # I don't like the output. What should I do?
