@@ -43,18 +43,18 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
     Try changing functions from this:
     ```typescript
     export const router = t.router({
-    	getPosts: t.procedure.query(({ctx}) => ctx.prisma.post.findMany().then(res => res.map(modifyPost)))
-    })
+        getPosts: t.procedure.query(({ctx}) => ctx.prisma.post.findMany().then(res => res.map(modifyPost))),
+    });
     ```
 
     to this:
     ```typescript
     export const router = t.router({
-    	getPosts: t.procedure.query(async ({ctx}) => {
+        getPosts: t.procedure.query(async ({ctx}) => {
             const res = await ctx.prisma.post.findMany();
             return res.map(modifyPost);
-        })
-    })
+        }),
+    });
     ```
 
   - Using well-defined types:
@@ -63,10 +63,10 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
     
     ```typescript
     export const router = t.router({
-    	getPosts: t.procedure.query(async ({ctx}): Promise<MyComplexObject> => {
+        getPosts: t.procedure.query(async ({ctx}): Promise<MyComplexObject> => {
             return await getVeryComplexObject();
-        })
-    })
+        }),
+    });
     ```
 
 - #### @outputify-ignore
@@ -75,11 +75,9 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
   ```typescript
   t.router({
       // No output will be generated.
-      myProc: t.procedure.query(
-      	/* @outputify-ignore */ () => {
-      		return Math.random();
-      	}
-      ),
+      myProc: t.procedure.query(/* @outputify-ignore */ () => {
+          return Math.random();
+      }),
       // Will generate output normally
       myOtherProc: t.procedure.query(() => "HELLO"),
   });
@@ -93,11 +91,11 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
   t.router({
       // No output will be generated.
       myProc: publicProcedureUnmodified.query(() => {
-    		return ...;
+          return ...;
       }),
       // Will generate output normally
       myOtherProc: publicProcedure.output(customValidator).mutation(() => {
-        return ...;
+          return ...;
       }),
   });
   ```
