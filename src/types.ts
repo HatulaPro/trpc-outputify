@@ -152,7 +152,6 @@ export function simplifyIntersectionType(t: Type<ts.Type>) {
 	const types = t.getIntersectionTypes();
 
 	if (types.every((type) => type.isObject())) {
-		console.log(t);
 		return t;
 	}
 
