@@ -23,9 +23,9 @@ $ trpc-outputify [options] [files]
 
 ### Examples
 
-- To validate the default procedures in all files that match the glob pattern `src/**/*.ts`, run:
+- To validate the default procedures in all files that match the glob pattern `routers/*.ts`, run:
   ```sh
-  $ trpc-outputify src/**/*.ts
+  $ trpc-outputify "routers/*.ts"
   ```
 - To only validate procedures named: `globalModProcedure` and `publicProcedure`, run:
   ```sh
