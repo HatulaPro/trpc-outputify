@@ -98,11 +98,11 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
   export const publicProcedureUnmodified = publicProcedure;
   t.router({
       // No output will be generated.
-      myProc: publicProcedureUnmodified.query(() => {
+      myProc: publicProcedureUnmodified.output(customValidator).query(() => {
           return ...;
       }),
       // Will generate output normally
-      myOtherProc: publicProcedure.output(customValidator).mutation(() => {
+      myOtherProc: publicProcedure.mutation(() => {
           return ...;
       }),
   });
