@@ -1,6 +1,6 @@
 {
 	"name": "trpc-outputify",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "A codemod that automatically adds an output validator to trpc procedures.",
 	"main": "./dist/index.mjs",
 	"module": "./dist/index.mjs",
@@ -9,6 +9,9 @@
 		"lint": "tsc && eslint",
 		"dev": "vitest",
 		"test": "vitest run"
+	},
+	"bin": {
+		"trpc-outputify": "./dist/index.mjs"
 	},
 	"keywords": [],
 	"author": "Shalev Raz Israel",
