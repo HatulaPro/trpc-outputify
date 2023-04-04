@@ -78,7 +78,7 @@ Often times the TypeScript compiler "overcomplicates" the types, which makes it 
     ```
 
 - ### @outputify-ignore
-  You can add an `@outputify-ignore` before your `query`/`mutation` functions calls. This lets the parser to know that want the procedure to remain unchanged.
+  You can add an `@outputify-ignore` before your `query`/`mutation` functions calls. This lets the parser know you want the procedure to remain unchanged.
 
   ```typescript
   t.router({
