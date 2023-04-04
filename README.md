@@ -1,9 +1,11 @@
+![demo of trpc-outputify in action](https://user-images.githubusercontent.com/70011806/229856342-3cc8ce19-2ace-4dcd-8ffc-5c37a6dde164.gif)
+
 # trpc-outputify
-`trpc-outputify` is a tool that automates the process of adding a [zod](https://zod.dev/) `.output()` validator to [trpc](https://trpc.io/) procedures, ensuring that the output of your procedures conforms to the expected schema, improving the safety and reliability of your trpc APIs.
+`trpc-outputify` is a tool that automates the process of adding a [zod](https://zod.dev/) `.output()` validator to [trpc](https://trpc.io/) procedures, ensuring the output conforms to the expected schema and improves API safety and reliability.
 
 > **NOTE:** `trpc-outputify` is still a work in progress, so it might have a few bugs. Please make sure the output fits your needs before running untrusted code.
 
-`trpc-outputify` relies the [TypeScript](https://www.typescriptlang.org/) compiler to generate the types, which means it can only understand the types TypeScript can understand. Generating validators that check the contents of the type (e.g. testing the length of a string) is not currently possible.
+`trpc-outputify` relies on the [TypeScript](https://www.typescriptlang.org/) compiler to generate the types, which means it can only understand the types TypeScript can understand. Generating validators that check the "contents" of the type (e.g. testing the length of a string) is not currently possible.
 
 ## Usage
 
