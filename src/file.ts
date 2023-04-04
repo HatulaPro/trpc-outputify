@@ -1,4 +1,4 @@
-import { bottomBar, type Options } from './cli';
+import { type Options } from './cli';
 import { Project, type SourceFile, SyntaxKind } from 'ts-morph';
 import { handleProcedure } from './procedure';
 import { Travelers } from './travelers';
@@ -19,9 +19,7 @@ export function createProject(tsConfigFilePath: string) {
 export function handleFile(p: Project, options: Options) {
 	return (sourceFile: SourceFile) => {
 		if (!options.silent) {
-			bottomBar.updateBottomBar(
-				'Parsing file: ' + sourceFile.getBaseName()
-			);
+			console.log('Parsing file: ' + sourceFile.getBaseName());
 		}
 		const numOfProceduresChanged = options.proceduresChanged;
 		const updateProceduresChangedCount = () => {
@@ -54,7 +52,7 @@ export function handleFile(p: Project, options: Options) {
 							.getFullText()
 							.includes('/* END GENERATED CONTENT */')
 					) {
-						bottomBar.log.write(
+						console.warn(
 							`Warning: rewriting existing output for procedure \`${procedure.name}\``
 						);
 					}
@@ -78,7 +76,7 @@ export function handleFile(p: Project, options: Options) {
 		if (!sourceFile.isSaved()) {
 			options.filesChanged++;
 			if (!options.silent) {
-				bottomBar.log.write(
+				console.log(
 					`Modified ${sourceFile.getBaseName()} (${
 						options.proceduresChanged - numOfProceduresChanged
 					} procedures updated)`

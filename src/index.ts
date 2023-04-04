@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import { exit } from 'process';
-import { bottomBar, parseArgs } from './cli';
+import { parseArgs } from './cli';
 import { createProject, handleFile } from './file';
 
 function main() {
@@ -11,9 +10,7 @@ function main() {
 	const sourceFiles = project.getSourceFiles(options.files);
 
 	if (!options.silent) {
-		bottomBar.log.write(
-			`Scanning ${sourceFiles.length} files at ${options.files}`
-		);
+		console.log(`Scanning ${sourceFiles.length} files at ${options.files}`);
 	}
 
 	sourceFiles.forEach(handleFile(project, options));
@@ -21,18 +18,18 @@ function main() {
 	project.saveSync();
 
 	if (!options.silent) {
-		bottomBar.updateBottomBar(
+		console.log(
 			`Modified ${options.filesChanged} files (${options.proceduresChanged} procedures updated)`
 		);
 	}
-	exit(0);
 }
 
 try {
 	void main();
+	process.exit(0);
 } catch (e) {
 	if (e instanceof Error) {
 		console.error(e.message);
-		exit(1);
+		process.exit(1);
 	}
 }

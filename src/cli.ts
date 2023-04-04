@@ -1,4 +1,3 @@
-import inquirer from 'inquirer';
 import { Command } from 'commander';
 
 export type Options = {
@@ -17,8 +16,6 @@ export const defaultOptions: Options = {
 	proceduresChanged: 0,
 	silent: true,
 };
-
-export const bottomBar = new inquirer.ui.BottomBar();
 
 export function parseArgs() {
 	const program = new Command()
