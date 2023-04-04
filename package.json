@@ -1,6 +1,11 @@
 {
 	"name": "trpc-outputify",
-	"version": "0.0.2",
+	"version": "0.0.4",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/HatulaPro/trpc-outputify.git",
+		"directory": "cli"
+	},
 	"description": "A codemod that automatically adds an output validator to trpc procedures.",
 	"main": "./dist/index.mjs",
 	"module": "./dist/index.mjs",

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { exit } from 'process';
 import { bottomBar, parseArgs } from './cli';
 import { createProject, handleFile } from './file';
