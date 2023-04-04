@@ -150,6 +150,12 @@ export function squashUnionTypes(types: Type<ts.Type>[]) {
 export function simplifyIntersectionType(t: Type<ts.Type>) {
 	if (!t.isIntersection()) return t;
 	const types = t.getIntersectionTypes();
+
+	if (types.every((type) => type.isObject())) {
+		console.log(t);
+		return t;
+	}
+
 	if (types.length !== 2)
 		throw new Error('Can not handle complex intersections.');
 

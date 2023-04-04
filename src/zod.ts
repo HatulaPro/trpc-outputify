@@ -98,12 +98,7 @@ function writeZodTypeRecursive({
 	} else if (t.isObject()) {
 		return writeObjectType({ node, f, t, depth });
 	} else if (t.isIntersection()) {
-		return writeZodTypeRecursive({
-			node,
-			f,
-			t: simplifyIntersectionType(t),
-			depth,
-		});
+		return writeIntersectionType({ node, f, t, depth });
 	} else if (isVoid(t)) {
 		return writeSimpleZodValidator(f, 'void');
 	}
@@ -204,6 +199,49 @@ function writeUnionType({ node, f, t, depth }: ZodWriter) {
 		return wrapWithModifier(currentZodType, f, 'optional');
 	}
 	return currentZodType;
+}
+
+function writeIntersectionType({ node, f, t, depth }: ZodWriter) {
+	depth++;
+
+	function writeIntersectionTypeRecursive(
+		types: Type<ts.Type>[]
+	): ts.CallExpression {
+		const [first, ...rest] = types;
+		if (rest.length > 1) {
+			return writeSimpleZodValidator(f, 'intersection', [
+				writeObjectType({ node, f, t: first!, depth }),
+				writeIntersectionTypeRecursive(rest),
+			]);
+		} else if (rest.length === 1) {
+			return writeSimpleZodValidator(f, 'intersection', [
+				writeObjectType({ node, f, t: first!, depth }),
+				writeObjectType({ node, f, t: rest[0]!, depth }),
+			]);
+		}
+		return writeObjectType({ node, f, t: first!, depth });
+	}
+
+	const intersectionTypes = t.getIntersectionTypes();
+	if (intersectionTypes.length === 1) {
+		return writeZodTypeRecursive({
+			node,
+			f,
+			t: intersectionTypes[0]!,
+			depth,
+		});
+	}
+	if (intersectionTypes.every((type) => type.isObject())) {
+		if (intersectionTypes.length === 0)
+			throw new Error('Invalid intersection detected.');
+		return writeIntersectionTypeRecursive(intersectionTypes);
+	}
+	return writeZodTypeRecursive({
+		node,
+		f,
+		t: simplifyIntersectionType(t),
+		depth,
+	});
 }
 
 function writeArrayType({ node, f, t, depth }: ZodWriter) {
