@@ -26,51 +26,57 @@ export function handleFile(p: Project, options: Options) {
 			options.proceduresChanged++;
 		};
 		sourceFile.forEachDescendant((node) => {
-			handleProcedure(p, options, node, (procedure) => {
-				const rpcSecion =
-					procedure.propAccessExprsMap.get('query') ||
-					procedure.propAccessExprsMap.get('mutation');
-				if (!rpcSecion) return;
-				const inputSection = procedure.propAccessExprsMap
-					.get('input')
-					?.getParentIfKind(SyntaxKind.CallExpression);
-				const outputSection = procedure.propAccessExprsMap
-					.get('output')
-					?.getParentIfKind(SyntaxKind.CallExpression);
-				// If no .output, create the output and put it right after the input
-				if (!outputSection && inputSection) {
-					inputSection.transform(
-						Travelers.addOutputAfterInput(procedure)
-					);
-				} else if (outputSection) {
-					if (
-						!options.silent &&
-						!outputSection
-							.getFullText()
-							.includes('/* BEGIN GENERATED CONTENT */') &&
-						!outputSection
-							.getFullText()
-							.includes('/* END GENERATED CONTENT */')
-					) {
-						console.warn(
-							`Warning: rewriting existing output for procedure \`${procedure.name}\``
+			try {
+				handleProcedure(p, options, node, (procedure) => {
+					const rpcSecion =
+						procedure.propAccessExprsMap.get('query') ||
+						procedure.propAccessExprsMap.get('mutation');
+					if (!rpcSecion) return;
+					const inputSection = procedure.propAccessExprsMap
+						.get('input')
+						?.getParentIfKind(SyntaxKind.CallExpression);
+					const outputSection = procedure.propAccessExprsMap
+						.get('output')
+						?.getParentIfKind(SyntaxKind.CallExpression);
+					// If no .output, create the output and put it right after the input
+					if (!outputSection && inputSection) {
+						inputSection.transform(
+							Travelers.addOutputAfterInput(procedure)
 						);
-					}
+					} else if (outputSection) {
+						if (
+							!options.silent &&
+							!outputSection
+								.getFullText()
+								.includes('/* BEGIN GENERATED CONTENT */') &&
+							!outputSection
+								.getFullText()
+								.includes('/* END GENERATED CONTENT */')
+						) {
+							console.warn(
+								`Warning: rewriting existing output for procedure \`${procedure.name}\``
+							);
+						}
 
-					// If there is an output already, update it
-					outputSection.transform(
-						Travelers.updateExistingOutput(
-							procedure,
-							updateProceduresChangedCount
-						)
-					);
-				} else {
-					// If there is no output and no input section, create the output section
-					rpcSecion
-						.getParent()!
-						.transform(Travelers.addOutputBeforeRPC(procedure));
+						// If there is an output already, update it
+						outputSection.transform(
+							Travelers.updateExistingOutput(
+								procedure,
+								updateProceduresChangedCount
+							)
+						);
+					} else {
+						// If there is no output and no input section, create the output section
+						rpcSecion
+							.getParent()!
+							.transform(Travelers.addOutputBeforeRPC(procedure));
+					}
+				});
+			} catch (e) {
+				if (e instanceof Error) {
+					console.error(e.message);
 				}
-			});
+			}
 		});
 		// If file changed, format it
 		if (!sourceFile.isSaved()) {
