@@ -18,7 +18,12 @@
 	"bin": {
 		"trpc-outputify": "./dist/index.mjs"
 	},
-	"keywords": [],
+	"keywords": [
+		"trpc-outputify",
+		"tRPC",
+		"zod",
+		"typescript"
+	],
 	"author": "Shalev Raz Israel",
 	"license": "MIT",
 	"devDependencies": {
