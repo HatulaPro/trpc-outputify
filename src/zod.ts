@@ -102,7 +102,7 @@ function writeZodTypeRecursive({
 	} else if (isVoid(t)) {
 		return writeSimpleZodValidator(f, 'void');
 	}
-	return f.createStringLiteral(t.getText());
+	return writeSimpleZodValidator(f, 'never');
 }
 
 function wrapWithComments(node: ts.Expression) {
