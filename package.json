@@ -1,6 +1,6 @@
 {
 	"name": "trpc-outputify",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/HatulaPro/trpc-outputify.git",
@@ -10,7 +10,7 @@
 	"main": "./dist/index.mjs",
 	"module": "./dist/index.mjs",
 	"scripts": {
-		"build": "tsup src/index.ts --format esm",
+		"build": "tsup src/index.ts --format esm --minify --treeshake",
 		"lint": "tsc && eslint",
 		"dev": "vitest",
 		"test": "vitest run"
